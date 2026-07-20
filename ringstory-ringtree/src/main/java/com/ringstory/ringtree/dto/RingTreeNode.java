@@ -1,10 +1,28 @@
-﻿package com.ringstory.ringtree.dto;
-import lombok.AllArgsConstructor; import lombok.Data;
+package com.ringstory.ringtree.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
-@Data @AllArgsConstructor
+
+/**
+ * 年轮树节点
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RingTreeNode {
+
+    /** 节点标签 */
     private String label;
-    private String type; // year/season/month/day
+
+    /** 节点类型（root/year/season/month/day） */
+    private String type;
+
+    /** 照片数量 */
     private int photoCount;
+
+    /** 子节点列表 */
     private List<RingTreeNode> children;
 }

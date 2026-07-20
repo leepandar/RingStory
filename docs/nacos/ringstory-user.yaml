@@ -1,0 +1,22 @@
+# ============================================================
+# RingStory User Service (group: RINGSTORY)
+# Data ID: ringstory-user.yaml
+# ============================================================
+
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/ringstory_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root123}
+
+sa-token:
+  token-name: Authorization
+  token-style: uuid
+  is-logout-clear-login: true
+  is-concurrent: true
+  is-share: false
+  timeout: 86400
+  activity-timeout: -1
+  is-read-cookie: false
+  is-read-header: true
+  is-read-body: false

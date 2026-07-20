@@ -1,12 +1,36 @@
-﻿package com.ringstory.story.entity;
-import com.baomidou.mybatisplus.annotation.*; import lombok.Data;
-import java.time.LocalDateTime;
-@Data @TableName("t_photo_note")
-public class PhotoNoteEntity {
-    @TableId(type=IdType.AUTO) private Long id; private Long photoId; private Long authorId;
-    private String content; private String locationName; private Double latitude; private Double longitude;
-    private String mentionedUsers; private Integer version;
-    @TableField(fill=FieldFill.INSERT) private LocalDateTime createdAt;
-    @TableField(fill=FieldFill.INSERT_UPDATE) private LocalDateTime updatedAt;
-    @TableLogic private LocalDateTime deletedAt;
+package com.ringstory.story.entity;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.ringstory.common.entity.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 照片笔记实体
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName("t_photo_note")
+public class PhotoNoteEntity extends BaseEntity {
+
+    /** 照片ID */
+    private Long photoId;
+
+    /** 作者ID */
+    private Long authorId;
+
+    /** 笔记内容 */
+    private String content;
+
+    /** 位置名称 */
+    private String locationName;
+
+    /** 纬度 */
+    private Double latitude;
+
+    /** 经度 */
+    private Double longitude;
+
+    /** @提及的用户ID列表 */
+    private String mentionedUsers;
 }

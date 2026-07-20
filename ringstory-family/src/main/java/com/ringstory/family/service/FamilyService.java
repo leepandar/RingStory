@@ -1,4 +1,5 @@
-﻿package com.ringstory.family.service;
+package com.ringstory.family.service;
+
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ringstory.family.entity.FamilyEntity;
@@ -8,18 +9,28 @@ import com.ringstory.family.mapper.FamilyMapper;
 import com.ringstory.family.mapper.FamilyMemberMapper;
 import com.ringstory.family.mapper.InvitationMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 家庭服务
+ */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FamilyService extends ServiceImpl<FamilyMapper, FamilyEntity> {
+
     private final FamilyMemberMapper memberMapper;
     private final InvitationMapper invitationMapper;
 
-    @Transactional
+    /**
+     * 创建家庭并自动将创建者加入成员
+     */
+    @Transactional(rollbackFor = Exception.class)
     public FamilyEntity createFamily(String name, Long userId) {
         FamilyEntity family = new FamilyEntity();
         family.setName(name);
@@ -39,10 +50,16 @@ public class FamilyService extends ServiceImpl<FamilyMapper, FamilyEntity> {
         return family;
     }
 
+    /**
+     * 获取家庭成员列表
+     */
     public List<FamilyMemberEntity> getMembers(Long familyId) {
         return memberMapper.findByFamilyId(familyId);
     }
 
+    /**
+     * 创建家庭邀请
+     */
     public InvitationEntity createInvitation(Long familyId, Long userId) {
         InvitationEntity inv = new InvitationEntity();
         inv.setFamilyId(familyId);

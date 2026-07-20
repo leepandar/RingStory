@@ -1,4 +1,7 @@
-﻿spring:
+﻿server:
+  port: 8082
+
+spring:
   application:
     name: ringstory-family
   cloud:
@@ -16,6 +19,4 @@
         server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
         namespace: ${NACOS_NAMESPACE:public}
         group: RINGSTORY
-server:
-  port: 8082
 

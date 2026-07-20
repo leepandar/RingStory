@@ -1,12 +1,16 @@
-﻿package com.ringstory.gateway.filter;
+package com.ringstory.gateway.filter;
 
 import cn.dev33.satoken.reactor.filter.SaReactorFilter;
-import cn.dev33.satoken.stp.SaManager;
+import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 网关全局鉴权过滤器
+ */
 @Slf4j
 @Configuration
 public class AuthGlobalFilter {
@@ -24,7 +28,7 @@ public class AuthGlobalFilter {
                 )
                 // 鉴权逻辑
                 .setAuth(obj -> {
-                    SaManager.getStpLogic().checkLogin();
+                    SaRouter.match("/**").check(r -> StpUtil.checkLogin());
                 })
                 // 异常处理
                 .setError(e -> {

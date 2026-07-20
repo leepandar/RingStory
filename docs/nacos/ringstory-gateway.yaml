@@ -1,15 +1,10 @@
-﻿server:
-  port: 8080
+# ============================================================
+# RingStory Gateway (group: RINGSTORY)
+# Data ID: ringstory-gateway.yaml
+# ============================================================
 
 spring:
-  application:
-    name: ringstory-gateway
   cloud:
-    nacos:
-      discovery:
-        server-addr: ${NACOS_ADDR:localhost:8848}
-        namespace: ringstory
-        group: DEFAULT_GROUP
     sentinel:
       transport:
         dashboard: ${SENTINEL_DASHBOARD:127.0.0.1}:${SENTINEL_PORT:8718}
@@ -19,70 +14,58 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
       routes:
-        - id: user-route
+        - id: user
           uri: lb://ringstory-user
           predicates:
             - Path=/api/user/**
           filters:
             - StripPrefix=0
-
-        - id: family-route
+        - id: family
           uri: lb://ringstory-family
           predicates:
             - Path=/api/family/**
           filters:
             - StripPrefix=0
-
-        - id: album-route
+        - id: album
           uri: lb://ringstory-album
           predicates:
             - Path=/api/album/**,/api/photo/**
           filters:
             - StripPrefix=0
-
-        - id: ringtree-route
+        - id: ringtree
           uri: lb://ringstory-ringtree
           predicates:
             - Path=/api/ringtree/**
           filters:
             - StripPrefix=0
-
-        - id: story-route
+        - id: story
           uri: lb://ringstory-story
           predicates:
             - Path=/api/story/**,/api/note/**
           filters:
             - StripPrefix=0
-
-        - id: review-route
+        - id: review
           uri: lb://ringstory-review
           predicates:
             - Path=/api/review/**
           filters:
             - StripPrefix=0
-
-        - id: search-route
+        - id: search
           uri: lb://ringstory-search
           predicates:
             - Path=/api/search/**
           filters:
             - StripPrefix=0
-
-        - id: notify-route
+        - id: notify
           uri: lb://ringstory-notify
           predicates:
             - Path=/api/notification/**
           filters:
             - StripPrefix=0
 
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-
-# Sa-Token 配置
 sa-token:
   token-name: Authorization
   token-style: uuid
@@ -97,19 +80,4 @@ sa-token:
 
 logging:
   level:
-    com.alibaba.nacos: WARN
-    com.ringstory.gateway: DEBUG
     org.springframework.cloud.gateway: DEBUG
-spring:
-  cloud:
-    sentinel:
-      transport:
-        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1}:${SENTINEL_PORT:8718}
-      eager: true
-    gateway:
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin
-logging:
-  level:
-    com.alibaba.nacos: WARN
-    com.ringstory.gateway: DEBUG

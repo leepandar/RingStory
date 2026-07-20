@@ -1,4 +1,7 @@
-﻿spring:
+server:
+  port: 8081
+
+spring:
   application:
     name: ringstory-user
   cloud:
@@ -16,18 +19,4 @@
         server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
         namespace: ${NACOS_NAMESPACE:public}
         group: RINGSTORY
-server:
-  port: 8081
-
-sa-token:
-  token-name: Authorization
-  token-style: uuid
-  is-logout-clear-login: true
-  is-concurrent: true
-  is-share: false
-  timeout: 86400
-  activity-timeout: -1
-  is-read-cookie: false
-  is-read-header: true
-  is-read-body: false
 

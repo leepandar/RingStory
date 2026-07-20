@@ -1,40 +1,138 @@
-﻿package com.ringstory.album.controller;
-import com.ringstory.album.dto.Result;
+package com.ringstory.album.controller;
+
+import com.ringstory.album.entity.AlbumEntity;
 import com.ringstory.album.entity.CommentEntity;
 import com.ringstory.album.entity.PhotoEntity;
+import com.ringstory.album.service.AlbumService;
+import com.ringstory.album.service.CommentService;
+import com.ringstory.album.service.LikeService;
 import com.ringstory.album.service.PhotoService;
+import com.ringstory.common.response.R;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 import java.util.Map;
 
+/**
+ * 照片控制器
+ */
 @RestController
 @RequestMapping("/api/album")
 @RequiredArgsConstructor
 public class PhotoController {
+
     private final PhotoService photoService;
+    private final AlbumService albumService;
+    private final CommentService commentService;
+    private final LikeService likeService;
 
+    // ==================== 照片相关 ====================
+
+    /**
+     * 上传照片
+     */
     @PostMapping("/upload")
-    public Result<PhotoEntity> upload(@RequestParam Long familyId, @RequestParam Long userId,
-                                       @RequestParam("file") MultipartFile file) {
-        return Result.success(photoService.uploadPhoto(familyId, userId, file));
+    public R<PhotoEntity> upload(@RequestParam Long familyId,
+                                 @RequestParam Long userId,
+                                 @RequestParam("file") MultipartFile file) {
+        return R.success(photoService.uploadPhoto(familyId, userId, file));
     }
 
+    /**
+     * 获取时间线
+     */
     @GetMapping("/timeline")
-    public Result<?> timeline(@RequestParam Long familyId) {
-        return Result.success(photoService.getTimeLine(familyId));
+    public R<List<PhotoEntity>> timeline(@RequestParam Long familyId) {
+        return R.success(photoService.getTimeLine(familyId));
     }
 
+    /**
+     * 点赞/取消点赞
+     */
     @PostMapping("/{photoId}/like")
-    public Result<Boolean> like(@PathVariable Long photoId, @RequestParam Long userId) {
-        return Result.success(photoService.toggleLike(photoId, userId));
+    public R<Boolean> like(@PathVariable Long photoId, @RequestParam Long userId) {
+        return R.success(photoService.toggleLike(photoId, userId));
     }
 
+    /**
+     * 检查是否已点赞
+     */
+    @GetMapping("/{photoId}/like/check")
+    public R<Boolean> checkLike(@PathVariable Long photoId, @RequestParam Long userId) {
+        return R.success(likeService.isLiked(photoId, userId));
+    }
+
+    // ==================== 评论相关 ====================
+
+    /**
+     * 添加评论
+     */
     @PostMapping("/{photoId}/comment")
-    public Result<CommentEntity> comment(@PathVariable Long photoId, @RequestBody Map<String, Object> body) {
-        return Result.success(photoService.addComment(
-            photoId, Long.valueOf(body.get("authorId").toString()),
-            body.get("content").toString(),
-            body.containsKey("parentId") ? Long.valueOf(body.get("parentId").toString()) : null));
+    public R<CommentEntity> comment(@PathVariable Long photoId,
+                                    @RequestBody Map<String, Object> body) {
+        Long authorId = Long.valueOf(body.get("authorId").toString());
+        String content = body.get("content").toString();
+        Long parentId = body.containsKey("parentId")
+                ? Long.valueOf(body.get("parentId").toString()) : null;
+        return R.success(photoService.addComment(photoId, authorId, content, parentId));
+    }
+
+    /**
+     * 获取照片评论列表
+     */
+    @GetMapping("/{photoId}/comments")
+    public R<List<CommentEntity>> getComments(@PathVariable Long photoId) {
+        return R.success(commentService.listByPhotoId(photoId));
+    }
+
+    /**
+     * 删除评论
+     */
+    @DeleteMapping("/comment/{commentId}")
+    public R<Void> deleteComment(@PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
+        return R.success();
+    }
+
+    // ==================== 相册相关 ====================
+
+    /**
+     * 创建相册
+     */
+    @PostMapping("/album")
+    public R<AlbumEntity> createAlbum(@RequestBody Map<String, Object> body) {
+        Long familyId = Long.valueOf(body.get("familyId").toString());
+        String name = body.get("name").toString();
+        Long creatorId = Long.valueOf(body.get("creatorId").toString());
+        return R.success(albumService.createAlbum(familyId, name, creatorId));
+    }
+
+    /**
+     * 获取家庭相册列表
+     */
+    @GetMapping("/album/list")
+    public R<List<AlbumEntity>> listAlbums(@RequestParam Long familyId) {
+        return R.success(albumService.listByFamilyId(familyId));
+    }
+
+    /**
+     * 更新相册封面
+     */
+    @PutMapping("/album/{albumId}/cover")
+    public R<Void> updateCover(@PathVariable Long albumId,
+                               @RequestParam Long coverPhotoId) {
+        albumService.updateCover(albumId, coverPhotoId);
+        return R.success();
+    }
+
+    /**
+     * 删除相册
+     */
+    @DeleteMapping("/album/{albumId}")
+    public R<Void> deleteAlbum(@PathVariable Long albumId) {
+        albumService.deleteAlbum(albumId);
+        return R.success();
     }
 }

@@ -1,0 +1,14 @@
+# ============================================================
+# RingStory Search Service (group: RINGSTORY)
+# Data ID: ringstory-search.yaml
+# ============================================================
+
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/ringstory_search?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root123}
+  elasticsearch:
+    uris: ${ES_URIS:http://127.0.0.1:9200}
+    username: ${ES_USERNAME:}
+    password: ${ES_PASSWORD:}

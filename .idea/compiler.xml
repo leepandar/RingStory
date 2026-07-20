@@ -9,7 +9,10 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
         </processorPath>
+        <module name="ringstory-gateway" />
         <module name="ringstory-notify" />
         <module name="ringstory-search" />
         <module name="ringstory-album" />
@@ -17,21 +20,9 @@
         <module name="ringstory-api" />
         <module name="ringstory-family" />
         <module name="ringstory-review" />
-        <module name="ringstory-story" />
         <module name="ringstory-user" />
+        <module name="ringstory-story" />
         <module name="ringstory-common" />
-      </profile>
-      <profile name="Annotation profile for ringstory-gateway" enabled="$FLYWAY_ENABLED$">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="$FLYWAY_ENABLED$" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
-        </processorPath>
-        <module name="ringstory-gateway" />
       </profile>
     </annotationProcessing>
   </component>

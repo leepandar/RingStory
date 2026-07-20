@@ -1,4 +1,4 @@
-﻿package com.ringstory.family.entity;
+package com.ringstory.family.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ringstory.common.entity.BaseEntity;
@@ -7,29 +7,35 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
+/**
+ * 家庭成员实体
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("t_family_member")
 public class FamilyMemberEntity extends BaseEntity {
 
+    /** 家庭ID */
     private Long familyId;
+
+    /** 用户ID */
     private Long userId;
+
+    /** 角色（admin/member） */
     private String role;
+
+    /** 别名 */
     private String alias;
+
+    /** 通过哪个邀请加入 */
     private Long joinedVia;
+
+    /** 是否已人脸识别（0-否 1-是） */
     private Integer isFaceRecognized;
+
+    /** 状态 */
     private Integer status;
+
+    /** 加入时间 */
     private LocalDateTime joinTime;
-}
-package com.ringstory.family.entity;
-import com.baomidou.mybatisplus.annotation.*; import lombok.Data;
-import java.time.LocalDateTime;
-@Data @TableName("t_family_member")
-public class FamilyMemberEntity {
-    @TableId(type=IdType.AUTO) private Long id; private Long familyId; private Long userId;
-    private String role; private String alias; private Long joinedVia;
-    private Integer isFaceRecognized; private Integer status; private LocalDateTime joinTime;
-    @TableField(fill=FieldFill.INSERT) private LocalDateTime createdAt;
-    @TableField(fill=FieldFill.INSERT_UPDATE) private LocalDateTime updatedAt;
-    @TableLogic private LocalDateTime deletedAt;
 }

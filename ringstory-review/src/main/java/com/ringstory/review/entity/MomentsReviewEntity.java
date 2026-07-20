@@ -1,11 +1,53 @@
-﻿package com.ringstory.review.entity;
-import com.baomidou.mybatisplus.annotation.*; import lombok.Data;
+package com.ringstory.review.entity;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.ringstory.common.entity.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.time.LocalDateTime;
-@Data @TableName("t_moments_review")
-public class MomentsReviewEntity {
-    @TableId(type=IdType.AUTO) private Long id; private Long familyId; private String type;
-    private String title; private String coverUrl; private String resourceUrl; private String resourceType;
-    private String photoIds; private Long starMemberId; private String yearMonth;
-    private Integer status; private String errorMsg; private LocalDateTime generatedAt;
-    @TableField(fill=FieldFill.INSERT) private LocalDateTime createdAt;
+
+/**
+ * 放映室回顾实体
+ */
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName("t_moments_review")
+public class MomentsReviewEntity extends BaseEntity {
+
+    /** 家庭ID */
+    private Long familyId;
+
+    /** 类型（monthly/seasonal/yearly） */
+    private String type;
+
+    /** 标题 */
+    private String title;
+
+    /** 封面URL */
+    private String coverUrl;
+
+    /** 资源URL */
+    private String resourceUrl;
+
+    /** 资源类型 */
+    private String resourceType;
+
+    /** 关联照片ID列表（逗号分隔） */
+    private String photoIds;
+
+    /** 明星成员ID */
+    private Long starMemberId;
+
+    /** 年月标识 */
+    private String yearMonth;
+
+    /** 状态 */
+    private Integer status;
+
+    /** 错误信息 */
+    private String errorMsg;
+
+    /** 生成时间 */
+    private LocalDateTime generatedAt;
 }

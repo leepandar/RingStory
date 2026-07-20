@@ -1,5 +1,9 @@
-﻿spring:
-  application: { name: ringstory-album }
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ringstory-album
   cloud:
     nacos:
       config:
@@ -15,5 +19,3 @@
         server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
         namespace: ${NACOS_NAMESPACE:public}
         group: RINGSTORY
-server: { port: 8083 }
-

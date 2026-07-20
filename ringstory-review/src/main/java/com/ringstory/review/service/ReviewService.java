@@ -1,21 +1,28 @@
-﻿package com.ringstory.review.service;
+package com.ringstory.review.service;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ringstory.review.entity.MomentsReviewEntity;
 import com.ringstory.review.mapper.MomentsReviewMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
+
 import java.util.List;
 
+/**
+ * 放映室服务
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewService extends ServiceImpl<MomentsReviewMapper, MomentsReviewEntity> {
 
+    /**
+     * 生成月度回顾
+     */
     public void generateMonthlyReview(Long familyId, int year, int month) {
         String ym = String.format("%d-%02d", year, month);
-        log.info("Generating monthly review for family {} - {}", familyId, ym);
+        log.info("生成月度回顾: familyId={}, ym={}", familyId, ym);
 
         MomentsReviewEntity review = new MomentsReviewEntity();
         review.setFamilyId(familyId);
@@ -26,8 +33,11 @@ public class ReviewService extends ServiceImpl<MomentsReviewMapper, MomentsRevie
         save(review);
     }
 
+    /**
+     * 生成季度回顾
+     */
     public void generateSeasonalReview(Long familyId, int year, int season) {
-        log.info("Generating seasonal review for family {} - {} Q{}", familyId, year, season);
+        log.info("生成季度回顾: familyId={}, year={}, quarter={}", familyId, year, season);
         MomentsReviewEntity review = new MomentsReviewEntity();
         review.setFamilyId(familyId);
         review.setType("seasonal");
@@ -37,8 +47,11 @@ public class ReviewService extends ServiceImpl<MomentsReviewMapper, MomentsRevie
         save(review);
     }
 
+    /**
+     * 生成年度回顾
+     */
     public void generateYearlyReview(Long familyId, int year) {
-        log.info("Generating yearly review for family {} - {}", familyId, year);
+        log.info("生成年度回顾: familyId={}, year={}", familyId, year);
         MomentsReviewEntity review = new MomentsReviewEntity();
         review.setFamilyId(familyId);
         review.setType("yearly");
@@ -48,8 +61,11 @@ public class ReviewService extends ServiceImpl<MomentsReviewMapper, MomentsRevie
         save(review);
     }
 
+    /**
+     * 获取家庭回顾列表
+     */
     public List<MomentsReviewEntity> getReviews(Long familyId) {
         return lambdaQuery().eq(MomentsReviewEntity::getFamilyId, familyId)
-            .orderByDesc(MomentsReviewEntity::getCreatedAt).list();
+                .orderByDesc(MomentsReviewEntity::getCreateTime).list();
     }
 }

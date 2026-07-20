@@ -1,37 +1,48 @@
-﻿package com.ringstory.family.entity;
+package com.ringstory.family.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.ringstory.common.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * 家庭实体
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("t_family")
 public class FamilyEntity extends BaseEntity {
 
+    /** 家庭名称 */
     private String name;
+
+    /** 封面URL */
     private String coverUrl;
+
+    /** 创建者ID */
     private Long createdBy;
+
+    /** 加入方式（0-邀请 1-链接） */
     private Integer joinType;
+
+    /** 成员数 */
     private Integer memberCount;
+
+    /** 照片数 */
     private Integer photoCount;
+
+    /** 已用存储(bytes) */
     private Long storageUsed;
+
+    /** 存储上限(bytes) */
     private Long storageLimit;
+
+    /** 是否自动人脸聚类（0-否 1-是） */
     private Integer autoFaceCluster;
+
+    /** 全局隐藏位置（0-否 1-是） */
     private Integer globalHideLocation;
+
+    /** 状态 */
     private Integer status;
-}
-package com.ringstory.family.entity;
-import com.baomidou.mybatisplus.annotation.*; import lombok.Data;
-import java.time.LocalDateTime;
-@Data @TableName("t_family")
-public class FamilyEntity {
-    @TableId(type=IdType.AUTO) private Long id; private String name; private String coverUrl;
-    private Long createdBy; private Integer joinType; private Integer memberCount;
-    private Integer photoCount; private Long storageUsed; private Long storageLimit;
-    private Integer autoFaceCluster; private Integer globalHideLocation; private Integer status;
-    @TableField(fill=FieldFill.INSERT) private LocalDateTime createdAt;
-    @TableField(fill=FieldFill.INSERT_UPDATE) private LocalDateTime updatedAt;
-    @TableLogic private LocalDateTime deletedAt;
 }
