@@ -1,0 +1,13 @@
+﻿spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:127.0.0.1}:${SENTINEL_PORT:8718}
+      eager: true
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
+logging:
+  level:
+    com.alibaba.nacos: WARN
+    com.ringstory.gateway: DEBUG

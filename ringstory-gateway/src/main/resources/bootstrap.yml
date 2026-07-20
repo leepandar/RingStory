@@ -1,0 +1,44 @@
+﻿spring:
+  application: { name: ringstory-gateway }
+  cloud:
+    nacos:
+      config:
+        server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+        file-extension: yaml; namespace: ${NACOS_NAMESPACE:public}; group: RINGSTORY
+        shared-configs:
+          - data-id: ringstory-common.yaml
+            group: RINGSTORY
+            refresh: true
+      discovery:
+        server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: RINGSTORY
+    gateway:
+      routes:
+        - id: user
+          uri: lb://ringstory-user
+          predicates: [ Path=/api/user/** ]
+        - id: family
+          uri: lb://ringstory-family
+          predicates: [ Path=/api/family/** ]
+        - id: album
+          uri: lb://ringstory-album
+          predicates: [ Path=/api/album/** ]
+        - id: ringtree
+          uri: lb://ringstory-ringtree
+          predicates: [ Path=/api/ringtree/** ]
+        - id: story
+          uri: lb://ringstory-story
+          predicates: [ Path=/api/story/** ]
+        - id: review
+          uri: lb://ringstory-review
+          predicates: [ Path=/api/review/** ]
+        - id: search
+          uri: lb://ringstory-search
+          predicates: [ Path=/api/search/** ]
+        - id: notify
+          uri: lb://ringstory-notify
+          predicates: [ Path=/api/notification/** ]
+server: { port: 8080 }
+
+
