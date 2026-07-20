@@ -1,32 +1,35 @@
 ﻿package com.ringstory.gateway.filter;
+
+import cn.dev33.satoken.reactor.filter.SaReactorFilter;
+import cn.dev33.satoken.stp.SaManager;
+import cn.dev33.satoken.util.SaResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.core.Ordered;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Slf4j
-@Component
-public class AuthGlobalFilter implements GlobalFilter, Ordered {
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        String path = exchange.getRequest().getURI().getPath();
-        // 白名单：登录等接口不校验
-        if (path.contains("/api/user/wx-login") || path.contains("/favicon")) {
-            return chain.filter(exchange);
-        }
-        String token = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (token == null || token.isEmpty()) {
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
-        // TODO: 解析 JWT Token 并注入 userId Header
-        return chain.filter(exchange);
+@Configuration
+public class AuthGlobalFilter {
+
+    @Bean
+    public SaReactorFilter getSaReactorFilter() {
+        return new SaReactorFilter()
+                // 拦截所有路由
+                .addInclude("/**")
+                // 白名单
+                .addExclude(
+                        "/api/user/wx-login",
+                        "/favicon.ico",
+                        "/actuator/**"
+                )
+                // 鉴权逻辑
+                .setAuth(obj -> {
+                    SaManager.getStpLogic().checkLogin();
+                })
+                // 异常处理
+                .setError(e -> {
+                    log.error("网关鉴权异常: {}", e.getMessage());
+                    return SaResult.error(e.getMessage()).setCode(401);
+                });
     }
-    @Override
-    public int getOrder() { return -100; }
 }

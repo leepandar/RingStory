@@ -44,6 +44,7 @@
         <hutool.version>5.8.34</hutool.version>
         <knife4j.version>4.5.0</knife4j.version>
         <xxl-job.version>2.4.2</xxl-job.version>
+        <sa-token.version>1.45.0</sa-token.version>
     </properties>
 
     <dependencyManagement>
@@ -75,10 +76,16 @@
                 <artifactId>mybatis-plus-jsqlparser</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+            <!-- Spring Cloud Alibaba Extras -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+            </dependency>
             <!-- ShardingSphere -->
             <dependency>
                 <groupId>org.apache.shardingsphere</groupId>
-                <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+                <artifactId>shardingsphere-jdbc</artifactId>
                 <version>${shardingsphere.version}</version>
             </dependency>
             <!-- MapStruct -->
@@ -103,6 +110,17 @@
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${knife4j.version}</version>
+            </dependency>
+            <!-- Sa-Token -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
             </dependency>
             <!-- Inner Modules -->
             <dependency>
