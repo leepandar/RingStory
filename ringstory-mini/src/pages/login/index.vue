@@ -10,7 +10,12 @@
 
     <view class="login-area">
       <button class="btn-wx-login" :loading="loading" @click="handleWxLogin">
+        <!-- #ifdef MP-WEIXIN -->
         微信一键登录
+        <!-- #endif -->
+        <!-- #ifdef H5 -->
+        H5 开发模式登录
+        <!-- #endif -->
       </button>
       <text class="login-tip">登录即表示同意《用户协议》和《隐私政策》</text>
     </view>

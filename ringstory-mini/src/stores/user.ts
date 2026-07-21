@@ -27,20 +27,38 @@ export const useUserStore = defineStore('user', () => {
   }
 
   /**
-   * 微信登录
+   * 微信登录（小程序环境）/ H5 模拟登录（开发调试）
    */
   async function wxLogin(): Promise<boolean> {
     try {
-      const [loginErr, loginRes] = await uni.login({ provider: 'weixin' })
-      if (loginErr || !loginRes) {
+      let code = ''
+
+      // #ifdef MP-WEIXIN
+      // 微信小程序环境：真实 wx.login
+      const loginRes = await new Promise<UniApp.LoginRes | null>((resolve) => {
+        uni.login({
+          provider: 'weixin',
+          success: (res) => resolve(res),
+          fail: () => resolve(null)
+        })
+      })
+      if (!loginRes) {
         uni.showToast({ title: '微信登录失败', icon: 'none' })
         return false
       }
+      code = loginRes.code
+      // #endif
+
+      // #ifdef H5
+      // H5 环境：使用模拟 code 进行开发调试
+      code = 'h5_mock_' + Date.now()
+      console.log('[H5 开发模式] 使用模拟 code 登录')
+      // #endif
 
       const result = await request<{ token: string; userInfo: UserInfo; isNew: boolean }>({
         url: '/api/user/wx-login',
         method: 'POST',
-        data: { code: loginRes.code }
+        data: { code }
       })
 
       token.value = result.token
