@@ -1,0 +1,113 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "RingStory",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/onboarding/index",
+      "style": {
+        "navigationBarTitleText": "欢迎",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/upload/index",
+      "style": {
+        "navigationBarTitleText": "刻录新章"
+      }
+    },
+    {
+      "path": "pages/photo/detail",
+      "style": {
+        "navigationBarTitleText": "照片详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/family/create",
+      "style": {
+        "navigationBarTitleText": "创建家庭"
+      }
+    },
+    {
+      "path": "pages/family/members",
+      "style": {
+        "navigationBarTitleText": "家庭成员"
+      }
+    },
+    {
+      "path": "pages/family/invite",
+      "style": {
+        "navigationBarTitleText": "邀请家人"
+      }
+    },
+    {
+      "path": "pages/family/join",
+      "style": {
+        "navigationBarTitleText": "加入家庭"
+      }
+    },
+    {
+      "path": "pages/notification/index",
+      "style": {
+        "navigationBarTitleText": "年轮回声"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "RingStory",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4a90d9",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "时光年轮",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/upload/index",
+        "text": "刻录新章",
+        "iconPath": "static/tab/upload.png",
+        "selectedIconPath": "static/tab/upload-active.png"
+      },
+      {
+        "pagePath": "pages/notification/index",
+        "text": "年轮回声",
+        "iconPath": "static/tab/notify.png",
+        "selectedIconPath": "static/tab/notify-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tab/mine.png",
+        "selectedIconPath": "static/tab/mine-active.png"
+      }
+    ]
+  }
+}

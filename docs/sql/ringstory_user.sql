@@ -13,6 +13,8 @@ USE `ringstory_user`;
 CREATE TABLE `t_user` (
     `id`               BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
     `open_id`          VARCHAR(64)   DEFAULT NULL            COMMENT '微信openId',
+    `username`         VARCHAR(32)   DEFAULT NULL            COMMENT '管理后台用户名',
+    `password`         VARCHAR(128)  DEFAULT NULL            COMMENT '管理后台密码（BCrypt加密）',
     `union_id`         VARCHAR(64)   DEFAULT NULL            COMMENT '微信unionId',
     `nick_name`        VARCHAR(64)   DEFAULT NULL            COMMENT '昵称',
     `avatar_url`       VARCHAR(512)  DEFAULT NULL            COMMENT '头像URL',
@@ -27,6 +29,7 @@ CREATE TABLE `t_user` (
     `version`          INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_open_id` (`open_id`),
+    UNIQUE KEY `uk_username` (`username`),
     KEY `idx_union_id` (`union_id`),
     KEY `idx_phone` (`phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';

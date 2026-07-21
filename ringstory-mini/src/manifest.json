@@ -1,0 +1,38 @@
+{
+  "name": "RingStory",
+  "appid": "",
+  "description": "时光为轮，记忆成书 - 家庭共享相册",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "postcss": true,
+      "minified": true
+    },
+    "usingComponents": true,
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于记录照片拍摄位置"
+      }
+    },
+    "requiredPrivateInfos": ["chooseLocation"]
+  },
+  "h5": {
+    "router": {
+      "mode": "hash"
+    },
+    "devServer": {
+      "port": 5173,
+      "proxy": {
+        "/api": {
+          "target": "http://127.0.0.1:8080",
+          "changeOrigin": true
+        }
+      }
+    }
+  }
+}

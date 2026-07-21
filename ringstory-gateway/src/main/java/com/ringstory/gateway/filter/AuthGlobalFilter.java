@@ -23,6 +23,8 @@ public class AuthGlobalFilter {
                 // 白名单
                 .addExclude(
                         "/api/user/wx-login",
+                        "/api/user/captcha/**",
+                        "/api/user/admin-login",
                         "/favicon.ico",
                         "/actuator/**"
                 )

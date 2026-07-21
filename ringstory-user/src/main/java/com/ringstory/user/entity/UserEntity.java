@@ -18,6 +18,12 @@ public class UserEntity extends BaseEntity {
     /** 微信openId */
     private String openId;
 
+    /** 管理后台用户名（仅管理员账号） */
+    private String username;
+
+    /** 管理后台密码（BCrypt加密） */
+    private String password;
+
     /** 微信unionId */
     private String unionId;
 

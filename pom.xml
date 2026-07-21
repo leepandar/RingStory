@@ -24,6 +24,7 @@
         <module>ringstory-review</module>
         <module>ringstory-search</module>
         <module>ringstory-notify</module>
+        <module>ringstory-nacos</module>
     </modules>
 
     <parent>

@@ -43,4 +43,11 @@ public class UserService extends ServiceImpl<UserMapper, UserEntity> {
         StpUtil.login(user.getId());
         return StpUtil.getTokenValue();
     }
+
+    /**
+     * 根据用户名查找用户（管理后台登录）
+     */
+    public UserEntity findByUsername(String username) {
+        return lambdaQuery().eq(UserEntity::getUsername, username).one();
+    }
 }
