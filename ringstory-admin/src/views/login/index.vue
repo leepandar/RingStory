@@ -2,44 +2,71 @@
   <div class="login-page">
     <!-- 左侧品牌区域 -->
     <div class="brand-panel">
-      <!-- 动态背景装饰 -->
-      <div class="bg-decoration">
-        <div class="circle circle-1" />
-        <div class="circle circle-2" />
-        <div class="circle circle-3" />
-        <div class="circle circle-4" />
+      <!-- 年轮装饰背景 -->
+      <div class="ring-bg">
+        <div class="ring ring-1" />
+        <div class="ring ring-2" />
+        <div class="ring ring-3" />
+        <div class="ring ring-4" />
+        <div class="ring ring-5" />
+        <div class="ring ring-6" />
+      </div>
+
+      <!-- 浮动光点 -->
+      <div class="particles">
+        <span v-for="i in 12" :key="i" class="particle" :style="particleStyle(i)" />
       </div>
 
       <div class="brand-content">
         <div class="brand-logo">
-          <div class="logo-icon">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5" />
-              <circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="2" opacity="0.7" />
-              <circle cx="24" cy="24" r="6" fill="currentColor" opacity="0.9" />
+          <div class="logo-rings">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+                <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="30s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="40" cy="40" r="26" stroke="currentColor" stroke-width="1.5" opacity="0.5">
+                <animateTransform attributeName="transform" type="rotate" from="360 40 40" to="0 40 40" dur="20s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="40" cy="40" r="16" stroke="currentColor" stroke-width="2" opacity="0.7" />
+              <circle cx="40" cy="40" r="5" fill="currentColor">
+                <animate attributeName="r" values="5;6;5" dur="3s" repeatCount="indefinite" />
+              </circle>
             </svg>
           </div>
           <span class="logo-text">RingStory</span>
         </div>
-        <h1 class="brand-title">家庭时光年轮</h1>
+
+        <h1 class="brand-title">
+          <span class="title-line">时光为轮</span>
+          <span class="title-line accent">记忆成书</span>
+        </h1>
+
         <p class="brand-desc">
-          时光为轮，<br />
-          记忆成书。
+          每一张照片都是一圈年轮，<br />
+          记录着家庭时光的温暖与美好。
         </p>
-        <div class="brand-stats">
-          <div class="stat-item">
-            <span class="stat-number">128+</span>
-            <span class="stat-label">活跃家庭</span>
+
+        <div class="brand-features">
+          <div class="feature-item">
+            <div class="feature-icon">📷</div>
+            <div class="feature-text">
+              <span class="feature-label">智能相册</span>
+              <span class="feature-desc">AI 分类整理</span>
+            </div>
           </div>
-          <div class="stat-divider" />
-          <div class="stat-item">
-            <span class="stat-number">3,600+</span>
-            <span class="stat-label">珍贵照片</span>
+          <div class="feature-item">
+            <div class="feature-icon">🌳</div>
+            <div class="feature-text">
+              <span class="feature-label">年轮图谱</span>
+              <span class="feature-desc">时光可视化</span>
+            </div>
           </div>
-          <div class="stat-divider" />
-          <div class="stat-item">
-            <span class="stat-number">99.9%</span>
-            <span class="stat-label">稳定运行</span>
+          <div class="feature-item">
+            <div class="feature-icon">🎬</div>
+            <div class="feature-text">
+              <span class="feature-label">年轮放映室</span>
+              <span class="feature-desc">自动生成回顾</span>
+            </div>
           </div>
         </div>
       </div>
@@ -137,6 +164,22 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
+function particleStyle(i: number) {
+  const size = 3 + Math.random() * 5
+  const x = Math.random() * 100
+  const y = Math.random() * 100
+  const delay = Math.random() * 8
+  const duration = 6 + Math.random() * 8
+  return {
+    width: `${size}px`,
+    height: `${size}px`,
+    left: `${x}%`,
+    top: `${y}%`,
+    animationDelay: `${delay}s`,
+    animationDuration: `${duration}s`
+  }
+}
+
 async function onSubmit() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
@@ -178,143 +221,167 @@ function onCaptchaFail() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(160deg, #0d1117 0%, #161b22 40%, #1a2332 70%, #0d1117 100%);
   overflow: hidden;
 }
 
-.bg-decoration {
+/* 年轮背景装饰 */
+.ring-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(88, 166, 255, 0.06);
+}
+
+.ring-1 { width: 200px; height: 200px; animation: ringPulse 8s ease-in-out infinite; }
+.ring-2 { width: 320px; height: 320px; animation: ringPulse 8s ease-in-out infinite 0.5s; }
+.ring-3 { width: 440px; height: 440px; animation: ringPulse 8s ease-in-out infinite 1s; }
+.ring-4 { width: 560px; height: 560px; animation: ringPulse 8s ease-in-out infinite 1.5s; }
+.ring-5 { width: 680px; height: 680px; animation: ringPulse 8s ease-in-out infinite 2s; }
+.ring-6 { width: 800px; height: 800px; animation: ringPulse 8s ease-in-out infinite 2.5s; }
+
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+/* 浮动光点 */
+.particles {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.circle {
+.particle {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.08;
+  background: rgba(88, 166, 255, 0.4);
+  animation: particleFloat 8s ease-in-out infinite;
 }
 
-.circle-1 {
-  width: 500px;
-  height: 500px;
-  background: #e94560;
-  top: -120px;
-  left: -100px;
-  animation: float 20s ease-in-out infinite;
-}
-
-.circle-2 {
-  width: 350px;
-  height: 350px;
-  background: #0f3460;
-  bottom: -80px;
-  right: -60px;
-  animation: float 15s ease-in-out infinite reverse;
-}
-
-.circle-3 {
-  width: 200px;
-  height: 200px;
-  background: #533483;
-  top: 40%;
-  right: 20%;
-  animation: float 18s ease-in-out infinite 2s;
-}
-
-.circle-4 {
-  width: 120px;
-  height: 120px;
-  background: #e94560;
-  bottom: 25%;
-  left: 15%;
-  animation: float 12s ease-in-out infinite 1s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -30px) scale(1.05); }
-  50% { transform: translate(-20px, 20px) scale(0.95); }
-  75% { transform: translate(15px, 15px) scale(1.02); }
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
 }
 
 .brand-content {
   position: relative;
   z-index: 2;
-  text-align: center;
-  padding: 40px;
-  max-width: 480px;
+  padding: 48px;
+  max-width: 500px;
 }
 
 .brand-logo {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 40px;
+  gap: 16px;
+  margin-bottom: 48px;
 }
 
-.logo-icon {
-  width: 52px;
-  height: 52px;
-  color: #e94560;
+.logo-rings {
+  width: 56px;
+  height: 56px;
+  color: #58a6ff;
 }
 
-.logo-icon svg {
+.logo-rings svg {
   width: 100%;
   height: 100%;
 }
 
 .logo-text {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 2px;
+  color: #e6edf3;
+  letter-spacing: 1px;
 }
 
 .brand-title {
-  font-size: 42px;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 20px;
+  margin: 0 0 24px;
+}
+
+.title-line {
+  display: block;
+  font-size: 44px;
+  font-weight: 800;
+  color: #e6edf3;
   line-height: 1.3;
+  letter-spacing: 2px;
+}
+
+.title-line.accent {
+  background: linear-gradient(135deg, #58a6ff, #a371f7, #f778ba);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .brand-desc {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.8;
-  margin: 0 0 50px;
+  font-size: 15px;
+  color: rgba(230, 237, 243, 0.5);
+  line-height: 1.9;
+  margin: 0 0 48px;
 }
 
-.brand-stats {
+.brand-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s;
+}
+
+.feature-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(88, 166, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.feature-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  background: rgba(88, 166, 255, 0.1);
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
-.stat-item {
+.feature-text {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  gap: 2px;
 }
 
-.stat-number {
-  font-size: 24px;
-  font-weight: 700;
-  color: #e94560;
+.feature-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e6edf3;
 }
 
-.stat-label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.stat-divider {
-  width: 1px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.15);
+.feature-desc {
+  font-size: 12px;
+  color: rgba(230, 237, 243, 0.4);
 }
 
 /* ==================== 右侧表单面板 ==================== */
