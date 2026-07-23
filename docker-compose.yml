@@ -16,6 +16,9 @@ networks:
 volumes:
   mysql-data:
   redis-data:
+  es-data:
+  rocketmq-data:
+  rocketmq-logs:
 
 services:
 
@@ -60,6 +63,57 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  elasticsearch:
+    image: elasticsearch:8.15.0
+    container_name: ringstory-elasticsearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      TZ: Asia/Shanghai
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - ringstory-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.2.0
+    container_name: ringstory-rocketmq-namesrv
+    restart: unless-stopped
+    ports:
+      - "9876:9876"
+    command: sh mqnamesrv
+    environment:
+      JAVA_OPT_EXT: "-Xms256m -Xmx256m"
+    networks:
+      - ringstory-net
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.2.0
+    container_name: ringstory-rocketmq-broker
+    restart: unless-stopped
+    ports:
+      - "10911:10911"
+    command: sh mqbroker -n rocketmq-namesrv:9876 --enable-proxy
+    environment:
+      JAVA_OPT_EXT: "-Xms256m -Xmx512m"
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    volumes:
+      - rocketmq-data:/home/rocketmq/store
+      - rocketmq-logs:/home/rocketmq/logs
+    depends_on:
+      - rocketmq-namesrv
+    networks:
+      - ringstory-net
 
   # ==================== 注册/配置中心 ====================
 
@@ -175,6 +229,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PASSWORD: redis123
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8083:8083"
@@ -182,6 +237,7 @@ services:
       - ringstory-nacos
       - mysql
       - redis
+      - rocketmq-broker
     networks:
       - ringstory-net
 
@@ -197,12 +253,14 @@ services:
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PASSWORD: redis123
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8084:8084"
     depends_on:
       - ringstory-nacos
       - redis
+      - rocketmq-broker
     networks:
       - ringstory-net
 
@@ -268,12 +326,16 @@ services:
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PASSWORD: redis123
+      ES_URIS: http://elasticsearch:9200
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8087:8087"
     depends_on:
       - ringstory-nacos
       - redis
+      - elasticsearch
+      - rocketmq-broker
     networks:
       - ringstory-net
 
@@ -292,6 +354,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PASSWORD: redis123
+      ROCKETMQ_NAMESRV: rocketmq-namesrv:9876
       JAVA_OPTS: "-Xms256m -Xmx512m"
     ports:
       - "8088:8088"
@@ -299,5 +362,24 @@ services:
       - ringstory-nacos
       - mysql
       - redis
+      - rocketmq-broker
+    networks:
+      - ringstory-net
+
+  # ==================== 人脸聚类服务 (Rust) ====================
+
+  ringstory-face:
+    build:
+      context: ./ringstory-face
+    container_name: ringstory-face
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql://root:root123@mysql:3306/ringstory_album
+      RUST_LOG: info
+    ports:
+      - "8090:8090"
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
       - ringstory-net

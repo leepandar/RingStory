@@ -23,8 +23,8 @@
         <module name="ringstory-api" />
         <module name="ringstory-family" />
         <module name="ringstory-review" />
-        <module name="ringstory-user" />
         <module name="ringstory-story" />
+        <module name="ringstory-user" />
         <module name="ringstory-common" />
       </profile>
     </annotationProcessing>
@@ -37,7 +37,7 @@
       <module name="ringstory-common" options="-parameters" />
       <module name="ringstory-family" options="-parameters" />
       <module name="ringstory-gateway" options="-parameters" />
-      <module name="ringstory-nacos" options="" />
+      <module name="ringstory-nacos" options="-parameters" />
       <module name="ringstory-notify" options="-parameters" />
       <module name="ringstory-review" options="-parameters" />
       <module name="ringstory-ringtree" options="-parameters" />

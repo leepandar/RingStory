@@ -26,4 +26,9 @@ public interface FamilyService extends IService<FamilyEntity> {
      * 创建家庭邀请
      */
     InvitationEntity createInvitation(Long familyId, Long userId);
+
+    /**
+     * 增加家庭已用存储量
+     */
+    void incrementStorageUsed(Long familyId, long bytes);
 }

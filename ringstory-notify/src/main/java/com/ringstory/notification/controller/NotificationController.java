@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通知控制器
@@ -24,6 +25,24 @@ public class NotificationController {
     @GetMapping("/unread/{userId}")
     public R<List<NotificationEntity>> getUnread(@PathVariable Long userId) {
         return R.success(notificationService.getUnread(userId));
+    }
+
+    /**
+     * 获取通知列表（分页）
+     */
+    @GetMapping("/list/{userId}")
+    public R<List<NotificationEntity>> listNotifications(@PathVariable Long userId,
+                                                         @RequestParam(defaultValue = "1") int page,
+                                                         @RequestParam(defaultValue = "20") int size) {
+        return R.success(notificationService.listByUserId(userId, page, size));
+    }
+
+    /**
+     * 获取未读通知数量
+     */
+    @GetMapping("/count/{userId}")
+    public R<Map<String, Long>> countUnread(@PathVariable Long userId) {
+        return R.success(Map.of("count", notificationService.countUnread(userId)));
     }
 
     /**

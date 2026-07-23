@@ -70,6 +70,50 @@
         "navigationBarTitleText": "我的",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/ringtree/index",
+      "style": {
+        "navigationBarTitleText": "年轮图谱"
+      }
+    },
+    {
+      "path": "pages/search/index",
+      "style": {
+        "navigationBarTitleText": "搜索",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/review/index",
+      "style": {
+        "navigationBarTitleText": "年轮放映室",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/album/index",
+      "style": {
+        "navigationBarTitleText": "影集"
+      }
+    },
+    {
+      "path": "pages/tag/index",
+      "style": {
+        "navigationBarTitleText": "标签管理"
+      }
+    },
+    {
+      "path": "pages/person/index",
+      "style": {
+        "navigationBarTitleText": "人物相册"
+      }
+    },
+    {
+      "path": "pages/settings/notification",
+      "style": {
+        "navigationBarTitleText": "通知偏好"
+      }
     }
   ],
   "globalStyle": {

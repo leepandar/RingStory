@@ -107,4 +107,16 @@ public class FamilyController {
     public R<InvitationEntity> getInvitation(@PathVariable Long id) {
         return R.success(invitationService.getById(id));
     }
+
+    // ==================== 存储管理 ====================
+
+    /**
+     * 更新家庭存储用量（供 album-svc 调用）
+     */
+    @PutMapping("/{id}/storage")
+    public R<Void> updateStorage(@PathVariable Long id,
+                                 @RequestParam long bytes) {
+        familyService.incrementStorageUsed(id, bytes);
+        return R.success();
+    }
 }

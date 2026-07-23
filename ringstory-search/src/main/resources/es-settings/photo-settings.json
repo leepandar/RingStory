@@ -1,0 +1,14 @@
+{
+  "index": {
+    "number_of_shards": 3,
+    "number_of_replicas": 1
+  },
+  "analysis": {
+    "analyzer": {
+      "ik_smart_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard"
+      }
+    }
+  }
+}

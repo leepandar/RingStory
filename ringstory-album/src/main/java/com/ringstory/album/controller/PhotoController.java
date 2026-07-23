@@ -8,7 +8,10 @@ import com.ringstory.album.service.CommentService;
 import com.ringstory.album.service.LikeService;
 import com.ringstory.album.service.PhotoService;
 import com.ringstory.common.response.R;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +21,7 @@ import java.util.Map;
 /**
  * 照片控制器
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/album")
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class PhotoController {
      * 上传照片
      */
     @PostMapping("/upload")
+    @SentinelResource(value = "photoUpload", blockHandler = "uploadBlock")
     public R<PhotoEntity> upload(@RequestParam Long familyId,
                                  @RequestParam Long userId,
                                  @RequestParam("file") MultipartFile file) {
@@ -44,6 +49,7 @@ public class PhotoController {
      * 获取时间线
      */
     @GetMapping("/timeline")
+    @SentinelResource(value = "photoTimeline", blockHandler = "timelineBlock")
     public R<List<PhotoEntity>> timeline(@RequestParam Long familyId) {
         return R.success(photoService.getTimeLine(familyId));
     }
@@ -52,6 +58,7 @@ public class PhotoController {
      * 点赞/取消点赞
      */
     @PostMapping("/{photoId}/like")
+    @SentinelResource(value = "photoLike", blockHandler = "likeBlock")
     public R<Boolean> like(@PathVariable Long photoId, @RequestParam Long userId) {
         return R.success(photoService.toggleLike(photoId, userId));
     }
@@ -134,5 +141,22 @@ public class PhotoController {
     public R<Void> deleteAlbum(@PathVariable Long albumId) {
         albumService.deleteAlbum(albumId);
         return R.success();
+    }
+
+    // ==================== Sentinel 降级方法 ====================
+
+    public R<PhotoEntity> uploadBlock(Long familyId, Long userId, MultipartFile file, BlockException ex) {
+        log.warn("照片上传被限流, familyId={}", familyId);
+        return R.fail("系统繁忙，请稍后重试");
+    }
+
+    public R<List<PhotoEntity>> timelineBlock(Long familyId, BlockException ex) {
+        log.warn("时间线查询被限流, familyId={}", familyId);
+        return R.fail("系统繁忙，请稍后重试");
+    }
+
+    public R<Boolean> likeBlock(Long photoId, Long userId, BlockException ex) {
+        log.warn("点赞操作被限流, photoId={}", photoId);
+        return R.fail("操作过于频繁，请稍后重试");
     }
 }

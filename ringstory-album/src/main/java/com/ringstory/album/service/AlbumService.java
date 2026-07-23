@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ringstory.album.entity.AlbumEntity;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 相册服务接口
@@ -34,4 +35,19 @@ public interface AlbumService extends IService<AlbumEntity> {
      * 删除相册
      */
     void deleteAlbum(Long albumId);
+
+    /**
+     * 添加照片到影集
+     */
+    void addPhotosToAlbum(Long albumId, List<Long> photoIds, Long addedBy);
+
+    /**
+     * 从影集移除照片
+     */
+    void removePhotoFromAlbum(Long albumId, Long photoId);
+
+    /**
+     * 获取影集中的照片ID列表（按排序）
+     */
+    List<Long> getAlbumPhotoIds(Long albumId);
 }

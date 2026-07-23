@@ -1,7 +1,8 @@
 package com.ringstory.search.service;
 
+import com.ringstory.search.entity.PhotoDocument;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * 搜索服务接口
@@ -9,9 +10,19 @@ import java.util.Map;
 public interface SearchService {
 
     /**
-     * 搜索照片
+     * 搜索照片（基于 ES）
      */
-    List<Map<String, Object>> searchPhotos(Long familyId, String keyword,
-                                            Long personId, String location,
-                                            String dateFrom, String dateTo);
+    List<PhotoDocument> searchPhotos(Long familyId, String keyword,
+                                     Long personId, String location,
+                                     String dateFrom, String dateTo);
+
+    /**
+     * 同步照片备注到 ES
+     */
+    void syncPhotoNote(Long photoId, String noteContent);
+
+    /**
+     * 同步照片标签到 ES
+     */
+    void syncPhotoTags(Long photoId, List<String> tags);
 }

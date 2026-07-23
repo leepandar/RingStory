@@ -34,6 +34,18 @@
           <el-icon><Setting /></el-icon>
           <template #title>系统配置</template>
         </el-menu-item>
+        <el-menu-item index="/audit">
+          <el-icon><Document /></el-icon>
+          <template #title>审计日志</template>
+        </el-menu-item>
+        <el-menu-item index="/notifications">
+          <el-icon><Bell /></el-icon>
+          <template #title>通知管理</template>
+        </el-menu-item>
+        <el-menu-item index="/reviews">
+          <el-icon><VideoPlay /></el-icon>
+          <template #title>回顾管理</template>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 
@@ -70,7 +82,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { DataBoard, User, UserFilled, Picture, Setting, Fold, Expand } from '@element-plus/icons-vue'
+import { DataBoard, User, UserFilled, Picture, Setting, Fold, Expand, Document, Bell, VideoPlay } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()

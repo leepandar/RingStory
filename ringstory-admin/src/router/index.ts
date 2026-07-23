@@ -42,6 +42,24 @@ const routes: RouteRecordRaw[] = [
         name: 'Settings',
         component: () => import('@/views/settings/index.vue'),
         meta: { title: '系统配置' }
+      },
+      {
+        path: 'audit',
+        name: 'Audit',
+        component: () => import('@/views/audit/index.vue'),
+        meta: { title: '审计日志' }
+      },
+      {
+        path: 'notifications',
+        name: 'Notifications',
+        component: () => import('@/views/notification/index.vue'),
+        meta: { title: '通知管理' }
+      },
+      {
+        path: 'reviews',
+        name: 'Reviews',
+        component: () => import('@/views/review/index.vue'),
+        meta: { title: '回顾管理' }
       }
     ]
   }

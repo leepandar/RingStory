@@ -65,4 +65,13 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, FamilyEntity> i
         invitationMapper.insert(inv);
         return inv;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void incrementStorageUsed(Long familyId, long bytes) {
+        lambdaUpdate()
+                .eq(FamilyEntity::getId, familyId)
+                .setSql("storage_used = storage_used + " + bytes)
+                .update();
+    }
 }
