@@ -1,0 +1,56 @@
+# ================================
+# RingStory .gitignore
+# ================================
+
+# ---------- Java / Maven ----------
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+
+# ---------- IDE ----------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---------- Node.js (ringstory-mini / ringstory-admin) ----------
+node_modules/
+dist/
+.h5/
+unpackage/
+*.local
+.env.local
+.env.*.local
+
+# ---------- Rust (ringstory-face) ----------
+**/target/
+*.pdb
+Cargo.lock
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---------- Misc ----------
+*.bak
+*.tmp
+*.temp
