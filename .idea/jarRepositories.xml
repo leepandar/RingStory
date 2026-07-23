@@ -7,14 +7,64 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="changan_release_maven_apim-maven" />
+      <option name="name" value="changan_release_maven_apim-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/apim-maven/release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_release_maven_maven" />
+      <option name="name" value="changan_release_maven_maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/maven/release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_snapshot_maven_apim-maven" />
+      <option name="name" value="changan_snapshot_maven_apim-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/apim-maven/snapshot/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_snapshot_maven_devops-maven" />
+      <option name="name" value="changan_snapshot_maven_devops-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/devops-maven/snapshot/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="changan_release_maven_devops-maven" />
+      <option name="name" value="changan_release_maven_devops-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/devops-maven/release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_snapshot_maven_ams-maven" />
+      <option name="name" value="changan_snapshot_maven_ams-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/ams-maven/snapshot/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_release_maven_zhizao-maven" />
+      <option name="name" value="changan_release_maven_zhizao-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/zhizao-maven/release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_release_maven_ams-maven" />
+      <option name="name" value="changan_release_maven_ams-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/ams-maven/release/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Central Repository" />
+      <option name="url" value="https://gaia.changan.com.cn/mirrors/maven/" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="jboss.community" />
       <option name="name" value="JBoss Community repository" />
       <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="changan_snapshot_maven_zhizao-maven" />
+      <option name="name" value="changan_snapshot_maven_zhizao-maven" />
+      <option name="url" value="https://gaia.changan.com.cn/pkg/changan/maven/zhizao-maven/snapshot/" />
     </remote-repository>
   </component>
 </project>

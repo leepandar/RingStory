@@ -1,46 +1,27 @@
 package com.ringstory.album.service;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ringstory.album.entity.CommentEntity;
-import com.ringstory.album.mapper.CommentMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * 评论服务
+ * 评论服务接口
  */
-@Slf4j
-@Service
-public class CommentService extends ServiceImpl<CommentMapper, CommentEntity> {
+public interface CommentService extends IService<CommentEntity> {
 
     /**
      * 获取照片下的所有评论（按时间倒序）
      */
-    public List<CommentEntity> listByPhotoId(Long photoId) {
-        return lambdaQuery()
-                .eq(CommentEntity::getPhotoId, photoId)
-                .orderByDesc(CommentEntity::getCreateTime)
-                .list();
-    }
+    List<CommentEntity> listByPhotoId(Long photoId);
 
     /**
      * 获取评论的子评论
      */
-    public List<CommentEntity> listReplies(Long commentId) {
-        return lambdaQuery()
-                .eq(CommentEntity::getParentId, commentId)
-                .orderByAsc(CommentEntity::getCreateTime)
-                .list();
-    }
+    List<CommentEntity> listReplies(Long commentId);
 
     /**
      * 删除评论
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteComment(Long commentId) {
-        removeById(commentId);
-    }
+    void deleteComment(Long commentId);
 }

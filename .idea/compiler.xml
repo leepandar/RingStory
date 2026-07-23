@@ -2,13 +2,16 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for RingStory" enabled="$FLYWAY_ENABLED$">
+      <profile name="Maven default annotation processors profile">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="$FLYWAY_ENABLED$" />
+        <module name="ringstory-nacos" />
+      </profile>
+      <profile name="Annotation profile for RingStory" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
         </processorPath>
@@ -20,15 +23,9 @@
         <module name="ringstory-api" />
         <module name="ringstory-family" />
         <module name="ringstory-review" />
-        <module name="ringstory-story" />
         <module name="ringstory-user" />
+        <module name="ringstory-story" />
         <module name="ringstory-common" />
-      </profile>
-      <profile name="Maven default annotation processors profile" enabled="$FLYWAY_ENABLED$">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="$FLYWAY_ENABLED$" />
-        <module name="ringstory-nacos" />
       </profile>
     </annotationProcessing>
   </component>
@@ -40,7 +37,7 @@
       <module name="ringstory-common" options="-parameters" />
       <module name="ringstory-family" options="-parameters" />
       <module name="ringstory-gateway" options="-parameters" />
-      <module name="ringstory-nacos" options="-parameters" />
+      <module name="ringstory-nacos" options="" />
       <module name="ringstory-notify" options="-parameters" />
       <module name="ringstory-review" options="-parameters" />
       <module name="ringstory-ringtree" options="-parameters" />
