@@ -3,11 +3,8 @@
 -- 包含所有微服务数据库及表结构
 -- ============================================================
 
--- ************************************************************
--- 数据库: ringstory_user（用户服务 + 审计日志）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_user` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_user`;
+CREATE DATABASE IF NOT EXISTS `ringstory` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `ringstory`;
 
 -- 用户表
 CREATE TABLE `t_user` (
@@ -53,12 +50,6 @@ CREATE TABLE `t_audit_log` (
     KEY `idx_target` (`target_table`, `target_id`),
     KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='审计日志表';
-
--- ************************************************************
--- 数据库: ringstory_family（家庭服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_family` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_family`;
 
 -- 家庭表
 CREATE TABLE `t_family` (
@@ -120,12 +111,6 @@ CREATE TABLE `t_invitation` (
     UNIQUE KEY `uk_token` (`token`),
     KEY `idx_family_id` (`family_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邀请表';
-
--- ************************************************************
--- 数据库: ringstory_album（相册服务 + 标签 + 人脸聚类）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_album` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_album`;
 
 -- 相册表
 CREATE TABLE `t_album` (
@@ -290,11 +275,6 @@ CREATE TABLE `t_face_photo` (
     KEY `idx_photo_id` (`photo_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='照片人脸标注表';
 
--- ************************************************************
--- 数据库: ringstory_notify（通知服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_notify` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_notify`;
 
 -- 通知表
 CREATE TABLE `t_notification` (
@@ -340,11 +320,6 @@ CREATE TABLE `t_notification_setting` (
 --   "mute_all":         false
 -- }
 
--- ************************************************************
--- 数据库: ringstory_review（放映室服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_review` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_review`;
 
 -- 放映室回顾表
 CREATE TABLE `t_moments_review` (
@@ -370,11 +345,6 @@ CREATE TABLE `t_moments_review` (
     KEY `idx_year_month` (`family_id`, `year_month`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='放映室回顾表';
 
--- ************************************************************
--- 数据库: ringstory_story（故事服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_story` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_story`;
 
 -- 照片笔记表
 CREATE TABLE `t_photo_note` (
@@ -407,3 +377,12 @@ CREATE TABLE `t_photo_note_history` (
     KEY `idx_note_id` (`note_id`),
     KEY `idx_note_version` (`note_id`, `version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='备注版本历史表';
+
+
+-- ============================================================
+-- 初始数据
+-- ============================================================
+
+-- 管理后台默认账号（仅开发环境使用，生产环境请修改密码并使用 BCrypt 加密）
+INSERT INTO `t_user` (`id`, `username`, `password`, `nick_name`, `status`)
+VALUES (1, 'admin', 'admin123', '系统管理员', 1);
