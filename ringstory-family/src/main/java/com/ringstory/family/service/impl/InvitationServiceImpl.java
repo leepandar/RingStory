@@ -2,6 +2,7 @@ package com.ringstory.family.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ringstory.common.exception.BusinessException;
+import com.ringstory.common.exception.ErrorCode;
 import com.ringstory.family.entity.InvitationEntity;
 import com.ringstory.family.mapper.InvitationMapper;
 import com.ringstory.family.service.InvitationService;
@@ -63,5 +64,23 @@ public class InvitationServiceImpl extends ServiceImpl<InvitationMapper, Invitat
                 .eq(InvitationEntity::getId, invitationId)
                 .set(InvitationEntity::getStatus, "expired")
                 .update();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public InvitationEntity resetInvitation(Long invitationId) {
+        InvitationEntity invitation = getById(invitationId);
+        if (invitation == null) {
+            throw new BusinessException(ErrorCode.INVITATION_NOT_FOUND);
+        }
+        int validityDays = invitation.getValidityDays() != null ? invitation.getValidityDays() : 7;
+        lambdaUpdate()
+                .eq(InvitationEntity::getId, invitationId)
+                .set(InvitationEntity::getStatus, "pending")
+                .set(InvitationEntity::getExpireTime, LocalDateTime.now().plusDays(validityDays))
+                .set(InvitationEntity::getUseCount, 0)
+                .update();
+        log.info("邀请已重置: invitationId={}, newExpireTime={}", invitationId, LocalDateTime.now().plusDays(validityDays));
+        return getById(invitationId);
     }
 }

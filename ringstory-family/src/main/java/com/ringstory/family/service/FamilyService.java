@@ -28,7 +28,17 @@ public interface FamilyService extends IService<FamilyEntity> {
     InvitationEntity createInvitation(Long familyId, Long userId);
 
     /**
+     * 创建家庭邀请（自定义有效天数）
+     */
+    InvitationEntity createInvitation(Long familyId, Long userId, int validityDays);
+
+    /**
      * 增加家庭已用存储量
      */
     void incrementStorageUsed(Long familyId, long bytes);
+
+    /**
+     * 设置人脸聚类开关
+     */
+    void setFaceClusterEnabled(Long familyId, boolean enabled);
 }

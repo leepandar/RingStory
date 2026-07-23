@@ -33,6 +33,9 @@ public class InvitationEntity extends BaseEntity {
     /** 已使用次数 */
     private Integer useCount;
 
-    /** 状态（pending/used/expired） */
+    /** 状态（pending/used/expired/revoked） */
     private String status;
+
+    /** 有效天数（1-30，默认7天） */
+    private Integer validityDays;
 }

@@ -1,14 +1,15 @@
 package com.ringstory.story.controller;
 
 import com.ringstory.common.response.R;
+import com.ringstory.story.dto.PhotoNoteDTO;
 import com.ringstory.story.entity.PhotoNoteEntity;
 import com.ringstory.story.entity.PhotoNoteHistoryEntity;
 import com.ringstory.story.service.StoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 故事控制器
@@ -29,25 +30,24 @@ public class StoryController {
     }
 
     /**
-     * 创建或更新照片笔记
+     * 创建或更新照片笔记（标准 DTO + @用户解析）
      */
     @PostMapping("/{photoId}")
     public R<PhotoNoteEntity> saveNote(@PathVariable Long photoId,
-                                       @RequestBody Map<String, Object> body) {
-        Long authorId = Long.valueOf(body.get("authorId").toString());
-        String content = body.getOrDefault("content", "").toString();
-        String locationName = body.getOrDefault("locationName", "").toString();
-        String mentionedUsers = body.getOrDefault("mentionedUsers", "").toString();
+                                       @Valid @RequestBody PhotoNoteDTO request) {
         return R.success(storyService.createOrUpdateNote(
-                photoId, authorId, content, locationName, mentionedUsers));
+                photoId, request.getAuthorId(), request.getContent(),
+                request.getLocationName(), request.getMentionedUserIds()));
     }
 
     /**
-     * 获取笔记版本历史
+     * 获取笔记版本历史（分页）
      */
     @GetMapping("/note/{noteId}/history")
-    public R<List<PhotoNoteHistoryEntity>> getNoteHistory(@PathVariable Long noteId) {
-        return R.success(storyService.getNoteHistory(noteId));
+    public R<List<PhotoNoteHistoryEntity>> getNoteHistory(@PathVariable Long noteId,
+                                                           @RequestParam(defaultValue = "1") int page,
+                                                           @RequestParam(defaultValue = "20") int size) {
+        return R.success(storyService.getNoteHistory(noteId, page, size));
     }
 
     /**
@@ -55,7 +55,7 @@ public class StoryController {
      */
     @PostMapping("/note/{noteId}/rollback")
     public R<PhotoNoteEntity> rollbackNote(@PathVariable Long noteId,
-                                           @RequestBody Map<String, Object> body) {
+                                           @RequestBody java.util.Map<String, Object> body) {
         Integer targetVersion = Integer.valueOf(body.get("targetVersion").toString());
         Long operatorId = Long.valueOf(body.get("operatorId").toString());
         return R.success(storyService.rollbackNote(noteId, targetVersion, operatorId));

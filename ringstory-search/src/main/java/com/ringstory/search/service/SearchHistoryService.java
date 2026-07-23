@@ -19,7 +19,10 @@ public class SearchHistoryService {
 
     private final StringRedisTemplate redisTemplate;
     private static final String HISTORY_KEY_PREFIX = "search:history:";
+    /** 保留最近10条记录 */
     private static final int MAX_HISTORY = 10;
+    /** 保留30天（通过 Redis TTL 实现） */
+    private static final long TTL_DAYS = 30;
 
     /**
      * 添加搜索记录
@@ -33,6 +36,8 @@ public class SearchHistoryService {
         redisTemplate.opsForList().leftPush(key, keyword);
         // 保留最近 MAX_HISTORY 条
         redisTemplate.opsForList().trim(key, 0, MAX_HISTORY - 1);
+        // 设置 TTL（30天自动清理）
+        redisTemplate.expire(key, TTL_DAYS, java.util.concurrent.TimeUnit.DAYS);
     }
 
     /**

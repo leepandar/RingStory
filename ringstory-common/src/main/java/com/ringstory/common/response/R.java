@@ -1,5 +1,6 @@
 package com.ringstory.common.response;
 
+import com.ringstory.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -55,5 +56,19 @@ public class R<T> implements Serializable {
 
     public static <T> R<T> badRequest(String message) {
         return new R<>(400, message, null, System.currentTimeMillis());
+    }
+
+    /**
+     * 使用 ErrorCode 枚举返回错误
+     */
+    public static <T> R<T> fail(ErrorCode errorCode) {
+        return new R<>(errorCode.getCode(), errorCode.getMessage(), null, System.currentTimeMillis());
+    }
+
+    /**
+     * 使用 ErrorCode 枚举 + 自定义消息
+     */
+    public static <T> R<T> fail(ErrorCode errorCode, String message) {
+        return new R<>(errorCode.getCode(), message, null, System.currentTimeMillis());
     }
 }

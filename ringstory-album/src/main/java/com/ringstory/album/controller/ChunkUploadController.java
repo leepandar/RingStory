@@ -1,5 +1,7 @@
 package com.ringstory.album.controller;
 
+import com.ringstory.common.exception.BusinessException;
+import com.ringstory.common.exception.ErrorCode;
 import com.ringstory.common.response.R;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +31,12 @@ public class ChunkUploadController {
 
     /**
      * 初始化分片上传
+     * RESTful: POST /api/album/uploads
      *
      * @param request 包含 familyId、fileName、totalChunks、fileSize
      * @return uploadId 用于后续分片上传
      */
-    @PostMapping("/chunk/init")
+    @PostMapping("/uploads")
     public R<ChunkInitVO> initUpload(@RequestBody ChunkInitRequest request) {
         String uploadId = UUID.randomUUID().toString().replace("-", "");
 
@@ -44,6 +47,7 @@ public class ChunkUploadController {
         state.totalChunks = request.getTotalChunks();
         state.fileSize = request.getFileSize();
         state.uploadedChunks = new boolean[request.getTotalChunks()];
+        state.etags = new String[request.getTotalChunks()];
 
         UPLOAD_STATES.put(uploadId, state);
 
@@ -57,47 +61,56 @@ public class ChunkUploadController {
     }
 
     /**
-     * 上传单个分片
-     *
-     * @param uploadId   上传任务ID
-     * @param chunkIndex 分片序号（从 0 开始）
-     * @return 上传结果
+     * 上传单个分片（幂等：相同 uploadId + partNumber 返回已有 ETag）
+     * RESTful: PUT /api/album/uploads/{uploadId}/parts/{partNumber}
      */
-    @PostMapping("/chunk/upload-part")
-    public R<Void> uploadPart(@RequestParam String uploadId,
-                              @RequestParam int chunkIndex) {
+    @PutMapping("/uploads/{uploadId}/parts/{partNumber}")
+    public R<ChunkPartVO> uploadPart(@PathVariable String uploadId,
+                                      @PathVariable int partNumber) {
         ChunkUploadState state = UPLOAD_STATES.get(uploadId);
         if (state == null) {
-            return R.error("上传任务不存在或已过期");
+            throw new BusinessException(ErrorCode.UPLOAD_TASK_NOT_FOUND);
         }
-        if (chunkIndex < 0 || chunkIndex >= state.totalChunks) {
-            return R.error("分片序号无效");
+        if (partNumber < 0 || partNumber >= state.totalChunks) {
+            throw new BusinessException(ErrorCode.UPLOAD_PART_INVALID);
+        }
+
+        // 幂等性：如果该分片已上传，返回已有 ETag
+        if (state.uploadedChunks[partNumber] && state.etags[partNumber] != null) {
+            ChunkPartVO vo = new ChunkPartVO();
+            vo.setEtag(state.etags[partNumber]);
+            vo.setAlreadyUploaded(true);
+            return R.success(vo);
         }
 
         // TODO: 生产环境接收 MultipartFile 并上传到 OSS Multipart
-        state.uploadedChunks[chunkIndex] = true;
+        String etag = UUID.randomUUID().toString().replace("-", "");
+        state.uploadedChunks[partNumber] = true;
+        state.etags[partNumber] = etag;
 
-        log.debug("分片上传: uploadId={}, chunkIndex={}/{}", uploadId, chunkIndex + 1, state.totalChunks);
-        return R.success();
+        log.debug("分片上传: uploadId={}, partNumber={}/{}", uploadId, partNumber + 1, state.totalChunks);
+
+        ChunkPartVO vo = new ChunkPartVO();
+        vo.setEtag(etag);
+        vo.setAlreadyUploaded(false);
+        return R.success(vo);
     }
 
     /**
      * 完成分片上传（合并分片）
-     *
-     * @param uploadId 上传任务ID
-     * @return 最终 OSS 路径
+     * RESTful: PUT /api/album/uploads/{uploadId}/complete
      */
-    @PostMapping("/chunk/complete")
-    public R<ChunkCompleteVO> completeUpload(@RequestParam String uploadId) {
+    @PutMapping("/uploads/{uploadId}/complete")
+    public R<ChunkCompleteVO> completeUpload(@PathVariable String uploadId) {
         ChunkUploadState state = UPLOAD_STATES.get(uploadId);
         if (state == null) {
-            return R.error("上传任务不存在或已过期");
+            throw new BusinessException(ErrorCode.UPLOAD_TASK_NOT_FOUND);
         }
 
         // 检查所有分片是否已上传
         for (int i = 0; i < state.uploadedChunks.length; i++) {
             if (!state.uploadedChunks[i]) {
-                return R.error("分片 " + i + " 尚未上传");
+                throw new BusinessException(ErrorCode.UPLOAD_INCOMPLETE, "分片 " + i + " 尚未上传");
             }
         }
 
@@ -116,11 +129,11 @@ public class ChunkUploadController {
     /**
      * 查询分片上传进度（断点续传用）
      */
-    @GetMapping("/chunk/progress")
-    public R<ChunkProgressVO> getProgress(@RequestParam String uploadId) {
+    @GetMapping("/uploads/{uploadId}/progress")
+    public R<ChunkProgressVO> getProgress(@PathVariable String uploadId) {
         ChunkUploadState state = UPLOAD_STATES.get(uploadId);
         if (state == null) {
-            return R.error("上传任务不存在或已过期");
+            throw new BusinessException(ErrorCode.UPLOAD_TASK_NOT_FOUND);
         }
 
         ChunkProgressVO vo = new ChunkProgressVO();
@@ -143,6 +156,7 @@ public class ChunkUploadController {
         int totalChunks;
         long fileSize;
         boolean[] uploadedChunks;
+        String[] etags;
     }
 
     @Data
@@ -157,6 +171,12 @@ public class ChunkUploadController {
     public static class ChunkInitVO {
         private String uploadId;
         private int totalChunks;
+    }
+
+    @Data
+    public static class ChunkPartVO {
+        private String etag;
+        private boolean alreadyUploaded;
     }
 
     @Data

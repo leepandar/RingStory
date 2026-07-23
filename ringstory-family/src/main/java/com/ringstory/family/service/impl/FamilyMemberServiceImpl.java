@@ -1,5 +1,7 @@
 package com.ringstory.family.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ringstory.family.entity.FamilyMemberEntity;
 import com.ringstory.family.mapper.FamilyMemberMapper;
@@ -29,6 +31,16 @@ public class FamilyMemberServiceImpl extends ServiceImpl<FamilyMemberMapper, Fam
     }
 
     @Override
+    public List<FamilyMemberEntity> listByFamilyIdPaged(Long familyId, int page, int size) {
+        Page<FamilyMemberEntity> pageParam = new Page<>(page, size);
+        IPage<FamilyMemberEntity> result = baseMapper.selectPage(pageParam,
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<FamilyMemberEntity>()
+                        .eq(FamilyMemberEntity::getFamilyId, familyId)
+                        .orderByDesc(FamilyMemberEntity::getJoinTime));
+        return result.getRecords();
+    }
+
+    @Override
     public FamilyMemberEntity getByUserAndFamily(Long userId, Long familyId) {
         return lambdaQuery()
                 .eq(FamilyMemberEntity::getUserId, userId)
@@ -50,7 +62,6 @@ public class FamilyMemberServiceImpl extends ServiceImpl<FamilyMemberMapper, Fam
         member.setRole("member");
         member.setJoinedVia(joinedVia);
         member.setIsFaceRecognized(0);
-        member.setStatus(1);
         member.setJoinTime(LocalDateTime.now());
         save(member);
 
@@ -75,7 +86,16 @@ public class FamilyMemberServiceImpl extends ServiceImpl<FamilyMemberMapper, Fam
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeMember(Long memberId) {
+    public void removeMember(Long memberId, boolean deletePhotos) {
+        // 逻辑删除（标记 deleted_at）
         removeById(memberId);
+        // 成员移除后，邀请状态不变（仅用 deleted_at 标记成员不存在）
+        if (deletePhotos) {
+            // TODO: 调用 album-svc 删除该成员的所有照片（含级联）
+            log.info("成员移除并删除照片: memberId={}", memberId);
+        } else {
+            // 照片保留，上传者标记为“已移除用户”
+            log.info("成员移除但保留照片: memberId={}", memberId);
+        }
     }
 }

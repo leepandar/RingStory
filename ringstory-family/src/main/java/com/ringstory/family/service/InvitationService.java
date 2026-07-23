@@ -27,4 +27,9 @@ public interface InvitationService extends IService<InvitationEntity> {
      * 过期邀请
      */
     void expireInvitation(Long invitationId);
+
+    /**
+     * 重置过期/撤销的邀请链接（重新生成过期时间，状态恢复为pending）
+     */
+    InvitationEntity resetInvitation(Long invitationId);
 }

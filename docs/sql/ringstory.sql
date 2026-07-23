@@ -3,11 +3,8 @@
 -- 包含所有微服务数据库及表结构
 -- ============================================================
 
--- ************************************************************
--- 数据库: ringstory_user（用户服务 + 审计日志）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_user` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_user`;
+CREATE DATABASE IF NOT EXISTS `ringstory` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `ringstory`;
 
 -- 用户表
 CREATE TABLE `t_user` (
@@ -54,12 +51,6 @@ CREATE TABLE `t_audit_log` (
     KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='审计日志表';
 
--- ************************************************************
--- 数据库: ringstory_family（家庭服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_family` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_family`;
-
 -- 家庭表
 CREATE TABLE `t_family` (
     `id`                  BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
@@ -83,19 +74,20 @@ CREATE TABLE `t_family` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='家庭表';
 
 -- 家庭成员表
+-- 移除 status 字段，仅用 deleted_at 标记逻辑删除（移除成员时标记 deleted_at）
+-- role 扩展为 admin/member/viewer 三级权限
 CREATE TABLE `t_family_member` (
     `id`                  BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
     `family_id`           BIGINT        NOT NULL                COMMENT '家庭ID',
     `user_id`             BIGINT        NOT NULL                COMMENT '用户ID',
-    `role`                VARCHAR(16)   DEFAULT 'member'        COMMENT '角色（admin/member）',
+    `role`                VARCHAR(16)   DEFAULT 'member'        COMMENT '角色（admin/member/viewer）',
     `alias`               VARCHAR(32)   DEFAULT NULL            COMMENT '别名',
     `joined_via`          BIGINT        DEFAULT NULL            COMMENT '通过哪个邀请加入',
     `is_face_recognized`  TINYINT       DEFAULT 0               COMMENT '是否已人脸识别（0-否 1-是）',
-    `status`              TINYINT       DEFAULT 1               COMMENT '状态（0-已移除 1-正常）',
     `join_time`           DATETIME      DEFAULT NULL            COMMENT '加入时间',
     `create_time`         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted_at`          DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
+    `deleted_at`          DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除，移除成员时标记）',
     `version`             INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_family_user` (`family_id`, `user_id`),
@@ -103,29 +95,26 @@ CREATE TABLE `t_family_member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='家庭成员表';
 
 -- 邀请表
+-- status 扩展为 pending/used/expired/revoked
+-- 新增 validity_days 支持管理员自定义有效期（1-30天）
 CREATE TABLE `t_invitation` (
-    `id`           BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
-    `family_id`    BIGINT        NOT NULL                COMMENT '家庭ID',
-    `inviter_id`   BIGINT        NOT NULL                COMMENT '邀请者ID',
-    `token`        VARCHAR(64)   NOT NULL                COMMENT '邀请令牌',
-    `expire_time`  DATETIME      NOT NULL                COMMENT '过期时间',
-    `max_uses`     INT           DEFAULT NULL            COMMENT '最大使用次数',
-    `use_count`    INT           DEFAULT 0               COMMENT '已使用次数',
-    `status`       VARCHAR(16)   DEFAULT 'pending'       COMMENT '状态（pending/used/expired）',
-    `create_time`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted_at`   DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
-    `version`      INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
+    `id`             BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
+    `family_id`      BIGINT        NOT NULL                COMMENT '家庭ID',
+    `inviter_id`     BIGINT        NOT NULL                COMMENT '邀请者ID',
+    `token`          VARCHAR(64)   NOT NULL                COMMENT '邀请令牌',
+    `expire_time`    DATETIME      NOT NULL                COMMENT '过期时间',
+    `max_uses`       INT           DEFAULT NULL            COMMENT '最大使用次数（NULL=无限）',
+    `use_count`      INT           DEFAULT 0               COMMENT '已使用次数',
+    `status`         VARCHAR(16)   DEFAULT 'pending'       COMMENT '状态（pending/used/expired/revoked）',
+    `validity_days`  INT           DEFAULT 7               COMMENT '有效天数（1-30，默认7天）',
+    `create_time`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted_at`     DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
+    `version`        INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_token` (`token`),
     KEY `idx_family_id` (`family_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邀请表';
-
--- ************************************************************
--- 数据库: ringstory_album（相册服务 + 标签 + 人脸聚类）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_album` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_album`;
 
 -- 相册表
 CREATE TABLE `t_album` (
@@ -145,6 +134,9 @@ CREATE TABLE `t_album` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='相册表';
 
 -- 照片表
+-- shoot_time 改为 NOT NULL：EXIF 无效时默认使用 upload_time
+-- like_count/comment_count 为冗余统计字段，由 RocketMQ 异步更新，不保证强一致性
+-- 缓存与数据库每小时对账，3分钟内允许误差
 CREATE TABLE `t_photo` (
     `id`                 BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
     `family_id`          BIGINT        NOT NULL                COMMENT '家庭ID',
@@ -156,8 +148,8 @@ CREATE TABLE `t_photo` (
     `width`              INT           DEFAULT NULL            COMMENT '宽度(px)',
     `height`             INT           DEFAULT NULL            COMMENT '高度(px)',
     `file_size`          BIGINT        DEFAULT NULL            COMMENT '文件大小(bytes)',
-    `shoot_time`         DATETIME      DEFAULT NULL            COMMENT '拍摄时间',
-    `upload_time`        DATETIME      DEFAULT NULL            COMMENT '上传时间',
+    `shoot_time`         DATETIME      NOT NULL                COMMENT '拍摄时间（EXIF无效时默认upload_time）',
+    `upload_time`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
     `latitude`           DOUBLE        DEFAULT NULL            COMMENT '纬度',
     `longitude`          DOUBLE        DEFAULT NULL            COMMENT '经度',
     `location_name`      VARCHAR(256)  DEFAULT NULL            COMMENT '位置名称',
@@ -165,16 +157,15 @@ CREATE TABLE `t_photo` (
     `blur_hash`          VARCHAR(64)   DEFAULT NULL            COMMENT '模糊哈希',
     `status`             TINYINT       DEFAULT 1               COMMENT '状态（0-待审核 1-正常 2-处理中 3-违规拦截）',
     `is_favorite`        TINYINT       DEFAULT 0               COMMENT '是否收藏（0-否 1-是）',
-    `like_count`         INT           DEFAULT 0               COMMENT '点赞数',
-    `comment_count`      INT           DEFAULT 0               COMMENT '评论数',
+    `like_count`         INT           DEFAULT 0               COMMENT '点赞数（冗余，RocketMQ异步更新）',
+    `comment_count`      INT           DEFAULT 0               COMMENT '评论数（冗余，RocketMQ异步更新）',
     `create_time`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted_at`         DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
     `version`            INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
-    KEY `idx_family_id` (`family_id`),
+    KEY `idx_family_shoot_time` (`family_id`, `shoot_time` DESC),
     KEY `idx_uploader_id` (`uploader_id`),
-    KEY `idx_shoot_time` (`family_id`, `shoot_time`),
     KEY `idx_md5` (`md5`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='照片表';
 
@@ -192,7 +183,8 @@ CREATE TABLE `t_comment` (
     `version`      INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     KEY `idx_photo_id` (`photo_id`),
-    KEY `idx_parent_id` (`parent_id`)
+    KEY `idx_parent_id` (`parent_id`),
+    KEY `idx_author_id` (`author_id`, `create_time` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论表';
 
 -- 点赞表
@@ -206,15 +198,16 @@ CREATE TABLE `t_like` (
     `version`      INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_photo_user` (`photo_id`, `user_id`),
-    KEY `idx_user_id` (`user_id`)
+    KEY `idx_user_photo` (`user_id`, `photo_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='点赞表';
 
 -- 照片影集关联表
+-- sort_order 规范为 ASC 排序，新增照片时自动计算 MAX(sort_order)+1
 CREATE TABLE `t_photo_album` (
     `id`           BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
     `photo_id`     BIGINT        NOT NULL                COMMENT '照片ID',
     `album_id`     BIGINT        NOT NULL                COMMENT '影集ID',
-    `sort_order`   INT           DEFAULT 0               COMMENT '排序序号',
+    `sort_order`   INT           DEFAULT 0               COMMENT '排序序号（ASC，新增时MAX+1）',
     `added_by`     BIGINT        NOT NULL                COMMENT '添加者ID',
     `create_time`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -273,13 +266,14 @@ CREATE TABLE `t_face_cluster` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='人脸聚类表';
 
 -- 照片人脸标注表
+-- embedding 字段仅保留 MySQL 引用，向量检索下沉至 ES dense_vector
 CREATE TABLE `t_face_photo` (
     `id`               BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
     `face_cluster_id`  BIGINT        NOT NULL                COMMENT '人脸聚类ID',
     `photo_id`         BIGINT        NOT NULL                COMMENT '照片ID',
     `face_coords`      VARCHAR(128)  DEFAULT NULL            COMMENT '人脸坐标JSON（{x,y,w,h}）',
     `confidence`       DOUBLE        DEFAULT NULL            COMMENT '置信度',
-    `embedding`        TEXT          DEFAULT NULL            COMMENT '人脸特征向量（512维，逗号分隔）',
+    `embedding`        TEXT          DEFAULT NULL            COMMENT '人脸特征向量（仅MySQL引用，检索用ES dense_vector）',
     `is_excluded`      TINYINT       DEFAULT 0               COMMENT '是否被手动排除（0-否 1-是）',
     `create_time`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -290,11 +284,6 @@ CREATE TABLE `t_face_photo` (
     KEY `idx_photo_id` (`photo_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='照片人脸标注表';
 
--- ************************************************************
--- 数据库: ringstory_notify（通知服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_notify` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_notify`;
 
 -- 通知表
 CREATE TABLE `t_notification` (
@@ -312,7 +301,7 @@ CREATE TABLE `t_notification` (
     `deleted_at`    DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
     `version`       INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
-    KEY `idx_recipient_id` (`recipient_id`, `is_read`),
+    KEY `idx_recipient_read_time` (`recipient_id`, `is_read`, `create_time` DESC),
     KEY `idx_family_id` (`family_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知表';
 
@@ -340,60 +329,79 @@ CREATE TABLE `t_notification_setting` (
 --   "mute_all":         false
 -- }
 
--- ************************************************************
--- 数据库: ringstory_review（放映室服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_review` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_review`;
 
 -- 放映室回顾表
+-- 移除 photo_ids 字段，迁移到 t_review_photo 关联表
+-- 新增 duration_seconds 字段记录视频/海报时长
 CREATE TABLE `t_moments_review` (
-    `id`             BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
-    `family_id`      BIGINT        NOT NULL                COMMENT '家庭ID',
-    `type`           VARCHAR(16)   NOT NULL                COMMENT '类型（monthly/seasonal/yearly）',
-    `title`          VARCHAR(128)  DEFAULT NULL            COMMENT '标题',
-    `cover_url`      VARCHAR(512)  DEFAULT NULL            COMMENT '封面URL',
-    `resource_url`   VARCHAR(512)  DEFAULT NULL            COMMENT '资源URL',
-    `resource_type`  VARCHAR(16)   DEFAULT NULL            COMMENT '资源类型（video/slideshow）',
-    `photo_ids`      VARCHAR(1024) DEFAULT NULL            COMMENT '关联照片ID列表（逗号分隔）',
-    `star_member_id` BIGINT        DEFAULT NULL            COMMENT '明星成员ID',
-    `year_month`     VARCHAR(7)    DEFAULT NULL            COMMENT '年月标识（如2024-01）',
-    `status`         TINYINT       DEFAULT 0               COMMENT '状态（0-生成中 1-已完成 2-失败）',
-    `error_msg`      VARCHAR(512)  DEFAULT NULL            COMMENT '错误信息',
-    `generated_at`   DATETIME      DEFAULT NULL            COMMENT '生成时间',
-    `create_time`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted_at`     DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
-    `version`        INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
+    `id`               BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
+    `family_id`        BIGINT        NOT NULL                COMMENT '家庭ID',
+    `type`             VARCHAR(16)   NOT NULL                COMMENT '类型（monthly/seasonal/yearly）',
+    `title`            VARCHAR(128)  DEFAULT NULL            COMMENT '标题',
+    `cover_url`        VARCHAR(512)  DEFAULT NULL            COMMENT '封面URL',
+    `resource_url`     VARCHAR(512)  DEFAULT NULL            COMMENT '资源URL',
+    `resource_type`    VARCHAR(16)   DEFAULT NULL            COMMENT '资源类型（video/slideshow）',
+    `duration_seconds` INT           DEFAULT NULL            COMMENT '时长（秒）',
+    `star_member_id`   BIGINT        DEFAULT NULL            COMMENT '明星成员ID',
+    `year_month`       VARCHAR(7)    DEFAULT NULL            COMMENT '年月标识（如2024-01）',
+    `status`           TINYINT       DEFAULT 0               COMMENT '状态（0-生成中 1-已完成 2-失败）',
+    `error_msg`        VARCHAR(512)  DEFAULT NULL            COMMENT '错误信息',
+    `generated_at`     DATETIME      DEFAULT NULL            COMMENT '生成时间',
+    `create_time`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted_at`       DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
+    `version`          INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     KEY `idx_family_id` (`family_id`),
     KEY `idx_year_month` (`family_id`, `year_month`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='放映室回顾表';
 
--- ************************************************************
--- 数据库: ringstory_story（故事服务）
--- ************************************************************
-CREATE DATABASE IF NOT EXISTS `ringstory_story` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `ringstory_story`;
+-- 回顾照片关联表（替代 t_moments_review.photo_ids 逗号分隔）
+CREATE TABLE `t_review_photo` (
+    `id`           BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
+    `review_id`    BIGINT        NOT NULL                COMMENT '回顾ID',
+    `photo_id`     BIGINT        NOT NULL                COMMENT '照片ID',
+    `sort_order`   INT           DEFAULT 0               COMMENT '排序序号',
+    `create_time`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_review_photo` (`review_id`, `photo_id`),
+    KEY `idx_photo_id` (`photo_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='回顾照片关联表';
+
 
 -- 照片笔记表
+-- 移除 mentioned_users 字段，迁移到 t_photo_note_mention 关联表
+-- 新增 current_version 字段指向最新版本
+-- 新增 family_id 冗余字段便于按家庭查询
 CREATE TABLE `t_photo_note` (
     `id`              BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
     `photo_id`        BIGINT        NOT NULL                COMMENT '照片ID',
+    `family_id`       BIGINT        NOT NULL                COMMENT '家庭ID（冗余，便于按家庭查询）',
     `author_id`       BIGINT        NOT NULL                COMMENT '作者ID',
     `content`         TEXT          DEFAULT NULL            COMMENT '笔记内容',
     `location_name`   VARCHAR(256)  DEFAULT NULL            COMMENT '位置名称',
     `latitude`        DOUBLE        DEFAULT NULL            COMMENT '纬度',
     `longitude`       DOUBLE        DEFAULT NULL            COMMENT '经度',
-    `mentioned_users` VARCHAR(512)  DEFAULT NULL            COMMENT '@提及的用户ID列表（逗号分隔）',
+    `current_version` INT           DEFAULT 1               COMMENT '当前版本号',
     `create_time`     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted_at`      DATETIME      DEFAULT NULL            COMMENT '删除时间（逻辑删除）',
     `version`         INT           NOT NULL DEFAULT 0      COMMENT '乐观锁版本号',
     PRIMARY KEY (`id`),
     KEY `idx_photo_id` (`photo_id`),
-    KEY `idx_author_id` (`author_id`)
+    KEY `idx_family_author` (`family_id`, `author_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='照片笔记表';
+
+-- 备注@提及用户关联表（替代 t_photo_note.mentioned_users 逗号分隔）
+CREATE TABLE `t_photo_note_mention` (
+    `id`           BIGINT        NOT NULL                COMMENT '主键ID（雪花算法）',
+    `note_id`      BIGINT        NOT NULL                COMMENT '备注ID',
+    `user_id`      BIGINT        NOT NULL                COMMENT '被@的用户ID',
+    `create_time`  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_note_user` (`note_id`, `user_id`),
+    KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='备注@提及用户关联表';
 
 -- 备注版本历史表
 CREATE TABLE `t_photo_note_history` (
@@ -407,3 +415,12 @@ CREATE TABLE `t_photo_note_history` (
     KEY `idx_note_id` (`note_id`),
     KEY `idx_note_version` (`note_id`, `version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='备注版本历史表';
+
+
+-- ============================================================
+-- 初始数据
+-- ============================================================
+
+-- 管理后台默认账号（仅开发环境使用，生产环境请修改密码并使用 BCrypt 加密）
+INSERT INTO `t_user` (`id`, `username`, `password`, `nick_name`, `status`)
+VALUES (1, 'admin', 'admin123', '系统管理员', 1);

@@ -55,6 +55,12 @@ public class PhotoDocument {
     @Field(type = FieldType.Date)
     private LocalDateTime uploadTime;
 
+    @Field(type = FieldType.Date)
+    private LocalDateTime createdAt;
+
+    @Field(type = FieldType.Date)
+    private LocalDateTime updatedAt;
+
     /**
      * 地理位置点
      */

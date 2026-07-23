@@ -1,5 +1,7 @@
 package com.ringstory.search.controller;
 
+import com.ringstory.common.exception.BusinessException;
+import com.ringstory.common.exception.ErrorCode;
 import com.ringstory.common.response.R;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
@@ -27,7 +29,7 @@ public class SearchController {
     private final EsIndexService esIndexService;
 
     /**
-     * 搜索照片
+     * 搜索照片（支持分页 + 参数校验）
      */
     @GetMapping
     @SentinelResource(value = "photoSearch", blockHandler = "searchBlock")
@@ -38,13 +40,19 @@ public class SearchController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String dateFrom,
             @RequestParam(required = false) String dateTo,
-            @RequestParam(required = false) Long userId) {
+            @RequestParam(required = false) Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        // 参数校验
+        if (familyId == null) {
+            throw new BusinessException(ErrorCode.SEARCH_PARAM_INVALID, "familyId不能为空");
+        }
         // 记录搜索历史
         if (userId != null && keyword != null && !keyword.isBlank()) {
             searchHistoryService.addHistory(userId, keyword);
         }
         return R.success(searchService.searchPhotos(
-                familyId, keyword, personId, location, dateFrom, dateTo));
+                familyId, keyword, personId, location, dateFrom, dateTo, page, size));
     }
 
     /**
@@ -77,8 +85,8 @@ public class SearchController {
 
     public R<List<PhotoDocument>> searchBlock(
             Long familyId, String keyword, Long personId, String location,
-            String dateFrom, String dateTo, Long userId, BlockException ex) {
+            String dateFrom, String dateTo, Long userId, int page, int size, BlockException ex) {
         log.warn("搜索接口被限流, familyId={}", familyId);
-        return R.fail("搜索服务繁忙，请稍后重试");
+        return R.fail(ErrorCode.INTERNAL_ERROR, "搜索服务繁忙，请稍后重试");
     }
 }

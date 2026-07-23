@@ -21,7 +21,7 @@ public class FamilyMemberEntity extends BaseEntity {
     /** 用户ID */
     private Long userId;
 
-    /** 角色（admin/member） */
+    /** 角色（admin/member/viewer） */
     private String role;
 
     /** 别名 */
@@ -32,9 +32,6 @@ public class FamilyMemberEntity extends BaseEntity {
 
     /** 是否已人脸识别（0-否 1-是） */
     private Integer isFaceRecognized;
-
-    /** 状态 */
-    private Integer status;
 
     /** 加入时间 */
     private LocalDateTime joinTime;

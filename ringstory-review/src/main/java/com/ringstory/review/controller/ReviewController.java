@@ -27,18 +27,23 @@ public class ReviewController {
     }
 
     /**
-     * 触发回顾生成
+     * 触发回顾生成（RESTful 路径参数）
+     * POST /api/review/{familyId}/generate?type=monthly&yearMonth=2026-07
      */
-    @PostMapping("/trigger")
-    public R<String> triggerReview(@RequestParam Long familyId,
-                                   @RequestParam String type,
-                                   @RequestParam int year,
-                                   @RequestParam(defaultValue = "1") int monthOrSeason) {
+    @PostMapping("/{familyId}/generate")
+    public R<String> generateReview(@PathVariable Long familyId,
+                                     @RequestParam String type,
+                                     @RequestParam String yearMonth) {
+        // 解析 yearMonth（格式：2026-07）
+        String[] parts = yearMonth.split("-");
+        int year = Integer.parseInt(parts[0]);
+        int month = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+
         switch (type) {
-            case "monthly" -> reviewService.generateMonthlyReview(familyId, year, monthOrSeason);
-            case "seasonal" -> reviewService.generateSeasonalReview(familyId, year, monthOrSeason);
+            case "monthly" -> reviewService.generateMonthlyReview(familyId, year, month);
+            case "seasonal" -> reviewService.generateSeasonalReview(familyId, year, (month - 1) / 3 + 1);
             case "yearly" -> reviewService.generateYearlyReview(familyId, year);
-            default -> { }
+            default -> throw new IllegalArgumentException("不支持的回顾类型: " + type);
         }
         return R.success("triggered");
     }

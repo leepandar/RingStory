@@ -33,8 +33,8 @@ public class MomentsReviewEntity extends BaseEntity {
     /** 资源类型 */
     private String resourceType;
 
-    /** 关联照片ID列表（逗号分隔） */
-    private String photoIds;
+    /** 时长（秒） */
+    private Integer durationSeconds;
 
     /** 明星成员ID */
     private Long starMemberId;

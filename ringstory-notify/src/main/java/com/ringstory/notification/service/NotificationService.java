@@ -17,9 +17,9 @@ public interface NotificationService extends IService<NotificationEntity> {
                            String title, String body, String targetUrl);
 
     /**
-     * 获取未读通知列表
+     * 获取未读通知列表（限制数量）
      */
-    List<NotificationEntity> getUnread(Long userId);
+    List<NotificationEntity> getUnread(Long userId, int limit);
 
     /**
      * 标记单条通知已读

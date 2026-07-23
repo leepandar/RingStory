@@ -1,4 +1,4 @@
-﻿package com.ringstory.user.mapper;
+package com.ringstory.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ringstory.user.entity.UserEntity;

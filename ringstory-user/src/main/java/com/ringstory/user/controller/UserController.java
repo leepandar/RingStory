@@ -62,4 +62,13 @@ public class UserController {
         StpUtil.logout();
         return R.success();
     }
+
+    /**
+     * 刷新 Token
+     * Refresh Token 失效则返回401要求重新登录
+     */
+    @PostMapping("/auth/refresh")
+    public R<String> refreshToken(@RequestParam String refreshToken) {
+        return R.success(userService.refreshToken(refreshToken));
+    }
 }

@@ -16,6 +16,9 @@ public class PhotoNoteEntity extends BaseEntity {
     /** 照片ID */
     private Long photoId;
 
+    /** 家庭ID（冗余，便于按家庭查询） */
+    private Long familyId;
+
     /** 作者ID */
     private Long authorId;
 
@@ -31,6 +34,6 @@ public class PhotoNoteEntity extends BaseEntity {
     /** 经度 */
     private Double longitude;
 
-    /** @提及的用户ID列表 */
-    private String mentionedUsers;
+    /** 当前版本号 */
+    private Integer currentVersion;
 }

@@ -73,7 +73,7 @@ sa-token:
   is-concurrent: true
   is-share: false
   timeout: 86400
-  activity-timeout: -1
+  active-timeout: -1
   is-read-cookie: false
   is-read-header: true
   is-read-body: false

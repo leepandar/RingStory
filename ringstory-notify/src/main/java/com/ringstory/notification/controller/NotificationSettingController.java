@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 通知偏好设置控制器
+ * 路径调整为 /api/notification/settings/{userId}
  */
 @RestController
-@RequestMapping("/api/notification/setting")
+@RequestMapping("/api/notification/settings")
 @RequiredArgsConstructor
 public class NotificationSettingController {
 
@@ -26,9 +27,9 @@ public class NotificationSettingController {
     }
 
     /**
-     * 保存/更新用户通知偏好设置
+     * 保存/更新用户通知偏好设置（PUT 幂等）
      */
-    @PostMapping("/{userId}")
+    @PutMapping("/{userId}")
     public R<Void> saveSettings(@PathVariable Long userId,
                                 @RequestBody String settingsJson) {
         notificationSettingService.saveOrUpdateSettings(userId, settingsJson);

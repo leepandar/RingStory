@@ -10,11 +10,12 @@ import java.util.List;
 public interface SearchService {
 
     /**
-     * 搜索照片（基于 ES）
+     * 搜索照片（基于 ES，支持分页）
      */
     List<PhotoDocument> searchPhotos(Long familyId, String keyword,
                                      Long personId, String location,
-                                     String dateFrom, String dateTo);
+                                     String dateFrom, String dateTo,
+                                     int page, int size);
 
     /**
      * 同步照片备注到 ES

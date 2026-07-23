@@ -1,11 +1,13 @@
 package com.ringstory.ringtree.controller;
 
 import com.ringstory.common.response.R;
-import com.ringstory.ringtree.dto.RingTreeNode;
+import com.ringstory.ringtree.dto.RingTreeNodeDTO;
 import com.ringstory.ringtree.service.RingTreeInvalidService;
 import com.ringstory.ringtree.service.RingTreeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 年轮树控制器
@@ -19,11 +21,21 @@ public class RingTreeController {
     private final RingTreeInvalidService ringTreeInvalidService;
 
     /**
-     * 获取家庭年轮树
+     * 获取家庭年轮树（完整树）
      */
     @GetMapping("/{familyId}")
-    public R<RingTreeNode> getRingTree(@PathVariable Long familyId) {
+    public R<RingTreeNodeDTO> getRingTree(@PathVariable Long familyId) {
         return R.success(ringTreeService.buildTree(familyId));
+    }
+
+    /**
+     * 按需加载子节点（懒加载）
+     * GET /api/ringtree/{familyId}/nodes?parentNodeId=xxx
+     */
+    @GetMapping("/{familyId}/nodes")
+    public R<List<RingTreeNodeDTO>> getChildNodes(@PathVariable Long familyId,
+                                                @RequestParam(required = false) String parentNodeId) {
+        return R.success(ringTreeService.getChildNodes(familyId, parentNodeId));
     }
 
     /**

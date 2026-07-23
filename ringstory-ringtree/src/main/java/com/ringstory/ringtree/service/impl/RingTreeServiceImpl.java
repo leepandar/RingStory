@@ -1,7 +1,7 @@
 package com.ringstory.ringtree.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ringstory.ringtree.dto.RingTreeNode;
+import com.ringstory.ringtree.dto.RingTreeNodeDTO;
 import com.ringstory.ringtree.service.RingTreeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,21 +34,21 @@ public class RingTreeServiceImpl implements RingTreeService {
     private static final int SPARSE_THRESHOLD = 3; // 月份照片数 < 3 视为稀疏
 
     @Override
-    public RingTreeNode buildTree(Long familyId) {
+    public RingTreeNodeDTO buildTree(Long familyId) {
         String cacheKey = CACHE_KEY_PREFIX + familyId;
 
         // 1. 尝试从 Redis 读取缓存
         try {
             String cached = redisTemplate.opsForValue().get(cacheKey);
             if (cached != null) {
-                return objectMapper.readValue(cached, RingTreeNode.class);
+                return objectMapper.readValue(cached, RingTreeNodeDTO.class);
             }
         } catch (Exception e) {
             log.warn("读取年轮树缓存失败: familyId={}, error={}", familyId, e.getMessage());
         }
 
         // 2. 缓存未命中，从 MySQL 构建
-        RingTreeNode root = buildTreeFromDb(familyId);
+        RingTreeNodeDTO root = buildTreeFromDb(familyId);
 
         // 3. 回填 Redis 缓存（TTL 1小时）
         try {
@@ -66,7 +66,7 @@ public class RingTreeServiceImpl implements RingTreeService {
     /**
      * 从数据库构建年轮树
      */
-    private RingTreeNode buildTreeFromDb(Long familyId) {
+    private RingTreeNodeDTO buildTreeFromDb(Long familyId) {
         // 查询所有照片的拍摄年份分布
         List<Map<String, Object>> years = jdbcTemplate.queryForList(
                 "SELECT YEAR(shoot_time) as y, COUNT(*) as cnt "
@@ -74,22 +74,22 @@ public class RingTreeServiceImpl implements RingTreeService {
                         + "GROUP BY YEAR(shoot_time) ORDER BY y DESC",
                 familyId);
 
-        List<RingTreeNode> yearNodes = years.stream().map(row -> {
+        List<RingTreeNodeDTO> yearNodes = years.stream().map(row -> {
             int year = ((Number) row.get("y")).intValue();
             int yearCnt = ((Number) row.get("cnt")).intValue();
-            List<RingTreeNode> seasonNodes = buildSeasonNodes(familyId, year);
-            return new RingTreeNode(String.valueOf(year), "year", yearCnt, seasonNodes);
+            List<RingTreeNodeDTO> seasonNodes = buildSeasonNodes(familyId, year);
+            return new RingTreeNodeDTO(String.valueOf(year), "year", yearCnt, seasonNodes);
         }).collect(Collectors.toList());
 
-        int totalCount = yearNodes.stream().mapToInt(RingTreeNode::getPhotoCount).sum();
-        return new RingTreeNode("家庭年轮", "root", totalCount, yearNodes);
+        int totalCount = yearNodes.stream().mapToInt(RingTreeNodeDTO::getPhotoCount).sum();
+        return new RingTreeNodeDTO("家庭年轮", "root", totalCount, yearNodes);
     }
 
     /**
      * 构建季节节点（含稀疏月份合并）
      */
-    private List<RingTreeNode> buildSeasonNodes(Long familyId, int year) {
-        List<RingTreeNode> seasons = new ArrayList<>();
+    private List<RingTreeNodeDTO> buildSeasonNodes(Long familyId, int year) {
+        List<RingTreeNodeDTO> seasons = new ArrayList<>();
         int[][] seasonRanges = {{3, 5}, {6, 8}, {9, 11}, {12, 2}};
 
         for (int i = 0; i < 4; i++) {
@@ -121,7 +121,7 @@ public class RingTreeServiceImpl implements RingTreeService {
                     .mapToInt(m -> ((Number) m.get("cnt")).intValue()).sum();
 
             // 稀疏月份合并：照片数 < 3 的月份合并为"季度碎片"
-            List<RingTreeNode> monthNodes = new ArrayList<>();
+            List<RingTreeNodeDTO> monthNodes = new ArrayList<>();
             List<Map<String, Object>> sparseMonths = new ArrayList<>();
 
             for (Map<String, Object> m : months) {
@@ -130,8 +130,8 @@ public class RingTreeServiceImpl implements RingTreeService {
                     sparseMonths.add(m);
                 } else {
                     int month = ((Number) m.get("m")).intValue();
-                    List<RingTreeNode> dayNodes = buildDayNodes(familyId, year, month);
-                    monthNodes.add(new RingTreeNode(month + "月", "month", cnt, dayNodes));
+                    List<RingTreeNodeDTO> dayNodes = buildDayNodes(familyId, year, month);
+                    monthNodes.add(new RingTreeNodeDTO(month + "月", "month", cnt, dayNodes));
                 }
             }
 
@@ -142,11 +142,11 @@ public class RingTreeServiceImpl implements RingTreeService {
                 String sparseLabel = sparseMonths.stream()
                         .map(m -> ((Number) m.get("m")).intValue() + "月")
                         .collect(Collectors.joining(","));
-                monthNodes.add(new RingTreeNode(
+                monthNodes.add(new RingTreeNodeDTO(
                         "碎片(" + sparseLabel + ")", "month_sparse", sparseCnt, new ArrayList<>()));
             }
 
-            seasons.add(new RingTreeNode(seasonLabel, "season", seasonCnt, monthNodes));
+            seasons.add(new RingTreeNodeDTO(seasonLabel, "season", seasonCnt, monthNodes));
         }
         return seasons;
     }
@@ -154,14 +154,14 @@ public class RingTreeServiceImpl implements RingTreeService {
     /**
      * 构建日期节点
      */
-    private List<RingTreeNode> buildDayNodes(Long familyId, int year, int month) {
+    private List<RingTreeNodeDTO> buildDayNodes(Long familyId, int year, int month) {
         List<Map<String, Object>> days = jdbcTemplate.queryForList(
                 "SELECT DAY(shoot_time) as d, COUNT(*) as cnt FROM t_photo_2026 "
                         + "WHERE family_id=? AND YEAR(shoot_time)=? AND MONTH(shoot_time)=? "
                         + "AND deleted_at IS NULL GROUP BY DAY(shoot_time) ORDER BY d",
                 familyId, year, month);
         return days.stream().map(row ->
-                new RingTreeNode(
+                new RingTreeNodeDTO(
                         ((Number) row.get("d")).intValue() + "日",
                         "day",
                         ((Number) row.get("cnt")).intValue(),

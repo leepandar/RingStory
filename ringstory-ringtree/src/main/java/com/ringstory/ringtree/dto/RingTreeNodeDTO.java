@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RingTreeNode {
+public class RingTreeNodeDTO {
 
     /** 节点标签 */
     private String label;
@@ -24,5 +24,5 @@ public class RingTreeNode {
     private int photoCount;
 
     /** 子节点列表 */
-    private List<RingTreeNode> children;
+    private List<RingTreeNodeDTO> children;
 }

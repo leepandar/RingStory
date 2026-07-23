@@ -16,6 +16,11 @@ public interface FamilyMemberService extends IService<FamilyMemberEntity> {
     List<FamilyMemberEntity> listByFamilyId(Long familyId);
 
     /**
+     * 获取家庭下的所有成员（分页）
+     */
+    List<FamilyMemberEntity> listByFamilyIdPaged(Long familyId, int page, int size);
+
+    /**
      * 根据用户ID和家庭ID获取成员
      */
     FamilyMemberEntity getByUserAndFamily(Long userId, Long familyId);
@@ -32,6 +37,7 @@ public interface FamilyMemberService extends IService<FamilyMemberEntity> {
 
     /**
      * 移除成员（逻辑删除）
+     * @param deletePhotos 是否同时删除成员的照片
      */
-    void removeMember(Long memberId);
+    void removeMember(Long memberId, boolean deletePhotos);
 }

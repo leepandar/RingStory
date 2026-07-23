@@ -20,11 +20,12 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     /**
-     * 获取未读通知列表
+     * 获取未读通知列表（支持限制数量）
      */
     @GetMapping("/unread/{userId}")
-    public R<List<NotificationEntity>> getUnread(@PathVariable Long userId) {
-        return R.success(notificationService.getUnread(userId));
+    public R<List<NotificationEntity>> getUnread(@PathVariable Long userId,
+                                                  @RequestParam(defaultValue = "10") int limit) {
+        return R.success(notificationService.getUnread(userId, limit));
     }
 
     /**

@@ -43,7 +43,6 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, FamilyEntity> i
         member.setFamilyId(family.getId());
         member.setUserId(userId);
         member.setRole("admin");
-        member.setStatus(1);
         member.setJoinTime(LocalDateTime.now());
         memberMapper.insert(member);
         return family;
@@ -56,11 +55,27 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, FamilyEntity> i
 
     @Override
     public InvitationEntity createInvitation(Long familyId, Long userId) {
+        return createInvitation(familyId, userId, 7);
+    }
+
+    @Override
+    public InvitationEntity createInvitation(Long familyId, Long userId, int validityDays) {
+        // 检查待使用邀请数量上限（10个）
+        long pendingCount = invitationMapper.selectCount(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<InvitationEntity>()
+                        .eq(InvitationEntity::getFamilyId, familyId)
+                        .eq(InvitationEntity::getStatus, "pending"));
+        if (pendingCount >= 10) {
+            throw new com.ringstory.common.exception.BusinessException(
+                    com.ringstory.common.exception.ErrorCode.INVITATION_LIMIT_EXCEEDED);
+        }
+
         InvitationEntity inv = new InvitationEntity();
         inv.setFamilyId(familyId);
         inv.setInviterId(userId);
         inv.setToken(IdUtil.fastSimpleUUID());
-        inv.setExpireTime(LocalDateTime.now().plusDays(7));
+        inv.setExpireTime(LocalDateTime.now().plusDays(validityDays));
+        inv.setValidityDays(validityDays);
         inv.setStatus("pending");
         invitationMapper.insert(inv);
         return inv;
@@ -73,5 +88,14 @@ public class FamilyServiceImpl extends ServiceImpl<FamilyMapper, FamilyEntity> i
                 .eq(FamilyEntity::getId, familyId)
                 .setSql("storage_used = storage_used + " + bytes)
                 .update();
+    }
+
+    @Override
+    public void setFaceClusterEnabled(Long familyId, boolean enabled) {
+        lambdaUpdate()
+                .eq(FamilyEntity::getId, familyId)
+                .set(FamilyEntity::getAutoFaceCluster, enabled ? 1 : 0)
+                .update();
+        log.info("人脸聚类开关已更新: familyId={}, enabled={}", familyId, enabled);
     }
 }

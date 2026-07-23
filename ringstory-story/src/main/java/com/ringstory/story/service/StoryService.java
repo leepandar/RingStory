@@ -17,10 +17,11 @@ public interface StoryService extends IService<PhotoNoteEntity> {
     PhotoNoteEntity getNoteByPhotoId(Long photoId);
 
     /**
-     * 创建或更新照片笔记（带乐观锁 + 版本历史）
+     * 创建或更新照片笔记（带乐观锁 + 版本历史 + @用户解析）
+     * @param mentionedUserIds @提及的用户ID列表（验证是否为家庭成员）
      */
     PhotoNoteEntity createOrUpdateNote(Long photoId, Long authorId, String content,
-                                       String locationName, String mentionedUsers);
+                                       String locationName, List<Long> mentionedUserIds);
 
     /**
      * 回滚到指定版本
@@ -28,12 +29,7 @@ public interface StoryService extends IService<PhotoNoteEntity> {
     PhotoNoteEntity rollbackNote(Long noteId, Integer targetVersion, Long operatorId);
 
     /**
-     * 获取笔记的版本历史
+     * 获取笔记的版本历史（分页）
      */
-    List<PhotoNoteHistoryEntity> getNoteHistory(Long noteId);
-
-    /**
-     * 解析内容中的 @提及，提取 mentionedUsers JSON
-     */
-    String parseMentions(String content);
+    List<PhotoNoteHistoryEntity> getNoteHistory(Long noteId, int page, int size);
 }
