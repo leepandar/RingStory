@@ -17,8 +17,8 @@
       <text class="empty-title">还没有加入家庭</text>
       <text class="empty-desc">创建或加入家庭，开始记录美好时光</text>
       <view class="empty-btns">
-        <button class="btn-create" @click="goCreateFamily">创建家庭</button>
-        <button class="btn-join" @click="goJoinFamily">加入家庭</button>
+        <button class="btn-create" :disabled="navLoading" @click="goCreateFamily">创建家庭</button>
+        <button class="btn-join" :disabled="navLoading" @click="goJoinFamily">加入家庭</button>
       </view>
     </view>
 
@@ -104,6 +104,7 @@ const loading = ref(false)
 const noMore = ref(false)
 const refreshing = ref(false)
 const unreadCount = ref(0)
+const navLoading = ref(false)
 
 const photoGroups = computed(() => {
   const groups: Record<string, PhotoItem[]> = {}
@@ -187,11 +188,21 @@ function goNotification() {
 }
 
 function goCreateFamily() {
-  uni.navigateTo({ url: '/pages/family/create' })
+  if (navLoading.value) return
+  navLoading.value = true
+  uni.navigateTo({
+    url: '/pages/family/create',
+    complete: () => { navLoading.value = false }
+  })
 }
 
 function goJoinFamily() {
-  uni.navigateTo({ url: '/pages/family/join' })
+  if (navLoading.value) return
+  navLoading.value = true
+  uni.navigateTo({
+    url: '/pages/family/join',
+    complete: () => { navLoading.value = false }
+  })
 }
 </script>
 

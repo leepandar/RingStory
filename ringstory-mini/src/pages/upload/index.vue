@@ -39,7 +39,7 @@
       <!-- 压缩策略 -->
       <view class="compress-option">
         <text class="option-label">智能压缩</text>
-        <switch :checked="compressEnabled" @change="compressEnabled = $event.detail.value" color="#4a90d9" />
+        <switch :checked="compressEnabled" @change="onCompressChange" color="#4a90d9" />
       </view>
 
       <!-- 上传按钮 -->
@@ -69,6 +69,10 @@ const compressEnabled = ref(true)
 const uploading = ref(false)
 
 const hasPending = computed(() => selectedPhotos.value.some(p => p.status === 'pending'))
+
+function onCompressChange(e: any) {
+  compressEnabled.value = e.detail.value
+}
 
 function choosePhotos() {
   uni.chooseImage({

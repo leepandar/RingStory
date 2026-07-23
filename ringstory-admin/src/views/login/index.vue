@@ -42,8 +42,7 @@
         </h1>
 
         <p class="brand-desc">
-          每一张照片都是一圈年轮，<br />
-          记录着家庭时光的温暖与美好。
+        每一张照片都是一圈年轮，记录着家庭时光的温暖与美好。
         </p>
 
         <div class="brand-features">

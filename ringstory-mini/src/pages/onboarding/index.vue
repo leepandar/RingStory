@@ -64,7 +64,7 @@ function nextSlide() {
 
 function goLogin() {
   uni.setStorageSync('onboarded', 'true')
-  uni.navigateTo({ url: '/pages/login/index' })
+  uni.redirectTo({ url: '/pages/login/index' })
 }
 </script>
 

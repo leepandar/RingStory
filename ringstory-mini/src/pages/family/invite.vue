@@ -13,7 +13,12 @@
 
       <!-- 操作按钮 -->
       <view class="action-btns">
+        <!-- #ifdef MP-WEIXIN -->
         <button class="btn-share" open-type="share">分享给微信好友</button>
+        <!-- #endif -->
+        <!-- #ifdef H5 -->
+        <button class="btn-share" @click="copyShareLink">复制分享链接</button>
+        <!-- #endif -->
         <button class="btn-qrcode" @click="generateQrCode">生成小程序码</button>
       </view>
     </view>
@@ -71,6 +76,18 @@ function copyToken() {
 function generateQrCode() {
   uni.showToast({ title: '小程序码生成中...', icon: 'none' })
   // TODO: 调用后端生成小程序码
+}
+
+function copyShareLink() {
+  // #ifdef H5
+  const link = window.location.origin + '/#/pages/family/join?token=' + invitationToken.value
+  uni.setClipboardData({
+    data: link,
+    success: () => {
+      uni.showToast({ title: '链接已复制', icon: 'success' })
+    }
+  })
+  // #endif
 }
 
 function statusText(status: string): string {

@@ -30,10 +30,10 @@
     </view>
 
     <view class="menu-group">
-      <view class="menu-item" @click="toggleCareMode">
+      <view class="menu-item">
         <text class="menu-icon">&#x1F50D;</text>
         <text class="menu-text">关怀模式（大字）</text>
-        <switch :checked="careMode" @change="toggleCareMode" color="#4a90d9" />
+        <switch :checked="careMode" @change="onCareModeChange" color="#4a90d9" />
       </view>
       <view class="menu-item" @click="goNotification">
         <text class="menu-icon">&#x1F514;</text>
@@ -129,26 +129,18 @@ function goNotification() {
   uni.navigateTo({ url: '/pages/notification/index' })
 }
 
-function toggleCareMode() {
-  careMode.value = !careMode.value
+function onCareModeChange(e: any) {
+  careMode.value = e.detail.value
   uni.setStorageSync('careMode', careMode.value ? 'true' : '')
   uni.showToast({ title: careMode.value ? '已开启关怀模式' : '已关闭关怀模式', icon: 'none' })
 }
 
 function feedback() {
-  // #ifdef MP-WEIXIN
-  // 微信小程序使用内置反馈页
-  uni.openCustomerServiceChat?.({
-    corpId: '',
-    url: '',
-    fail: () => {
-      uni.showToast({ title: '请在设置中反馈', icon: 'none' })
-    }
+  uni.showModal({
+    title: '意见反馈',
+    content: '请发送邮件至 feedback@ringstory.com\n我们会及时处理您的反馈。',
+    showCancel: false
   })
-  // #endif
-  // #ifndef MP-WEIXIN
-  uni.showToast({ title: '请发送邮件至 feedback@ringstory.com', icon: 'none' })
-  // #endif
 }
 
 function about() {
