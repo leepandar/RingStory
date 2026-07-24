@@ -1,0 +1,26 @@
+# RocketMQ 配置（业务模块 Nacos 配置文件中引入）
+ringstory:
+  rocketmq:
+    enabled: true
+    producer:
+      send-timeout: 3000
+      retry-times: 2
+      fail-fast: true
+    consumer:
+      thread-num: 20
+      max-retry-times: 3
+      consume-timeout: 15000
+
+spring:
+  cloud:
+    stream:
+      rocketmq:
+        binder:
+          name-server: 127.0.0.1:9876
+      # ---- 业务模块按需配置 bindings ----
+      # bindings:
+      #   <binding-name>-in-0:
+      #     destination: <topic-name>
+      #     group: <consumer-group>
+      #   <binding-name>-out-0:
+      #     destination: <topic-name>

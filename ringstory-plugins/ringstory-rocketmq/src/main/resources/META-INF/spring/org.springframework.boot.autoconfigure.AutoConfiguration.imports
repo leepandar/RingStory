@@ -1,0 +1,2 @@
+com.ringstory.rocketmq.config.RocketMQAutoConfiguration
+com.ringstory.rocketmq.producer.RocketMQProducerAutoConfiguration
