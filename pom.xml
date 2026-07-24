@@ -14,16 +14,8 @@
 
     <modules>
         <module>ringstory-common</module>
-        <module>ringstory-api</module>
         <module>ringstory-gateway</module>
-        <module>ringstory-user</module>
-        <module>ringstory-family</module>
-        <module>ringstory-album</module>
-        <module>ringstory-ringtree</module>
-        <module>ringstory-story</module>
-        <module>ringstory-review</module>
-        <module>ringstory-search</module>
-        <module>ringstory-notify</module>
+        <module>ringstory-modules</module>
         <module>ringstory-nacos</module>
     </modules>
 

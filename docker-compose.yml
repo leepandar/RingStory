@@ -168,13 +168,13 @@ services:
 
   ringstory-user:
     build:
-      context: ./ringstory-user
+      context: ./ringstory-modules/ringstory-user
     container_name: ringstory-user
     restart: unless-stopped
     environment:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: ringstory-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory_user?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
@@ -193,13 +193,13 @@ services:
 
   ringstory-family:
     build:
-      context: ./ringstory-family
+      context: ./ringstory-modules/ringstory-family
     container_name: ringstory-family
     restart: unless-stopped
     environment:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: ringstory-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory_family?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
@@ -218,13 +218,13 @@ services:
 
   ringstory-album:
     build:
-      context: ./ringstory-album
+      context: ./ringstory-modules/ringstory-album
     container_name: ringstory-album
     restart: unless-stopped
     environment:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: ringstory-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory_album?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
@@ -245,7 +245,7 @@ services:
 
   ringstory-ringtree:
     build:
-      context: ./ringstory-ringtree
+      context: ./ringstory-modules/ringstory-ringtree
     container_name: ringstory-ringtree
     restart: unless-stopped
     environment:
@@ -268,13 +268,13 @@ services:
 
   ringstory-story:
     build:
-      context: ./ringstory-story
+      context: ./ringstory-modules/ringstory-story
     container_name: ringstory-story
     restart: unless-stopped
     environment:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: ringstory-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory_story?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
@@ -293,13 +293,13 @@ services:
 
   ringstory-review:
     build:
-      context: ./ringstory-review
+      context: ./ringstory-modules/ringstory-review
     container_name: ringstory-review
     restart: unless-stopped
     environment:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: ringstory-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory_review?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
@@ -318,7 +318,7 @@ services:
 
   ringstory-search:
     build:
-      context: ./ringstory-search
+      context: ./ringstory-modules/ringstory-search
     container_name: ringstory-search
     restart: unless-stopped
     environment:
@@ -343,13 +343,13 @@ services:
 
   ringstory-notify:
     build:
-      context: ./ringstory-notify
+      context: ./ringstory-modules/ringstory-notify
     container_name: ringstory-notify
     restart: unless-stopped
     environment:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: ringstory-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: ringstory-nacos:8848
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory_notify?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ringstory?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
@@ -370,7 +370,7 @@ services:
 
   ringstory-face:
     build:
-      context: ./ringstory-face
+      context: ./ringstory-plugins/ringstory-face
     container_name: ringstory-face
     restart: unless-stopped
     environment:
