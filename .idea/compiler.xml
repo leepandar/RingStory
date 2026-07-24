@@ -28,6 +28,21 @@
         <module name="ringstory-common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ringstory" target="21" />
+      <module name="ringstory-album" target="21" />
+      <module name="ringstory-api" target="21" />
+      <module name="ringstory-common" target="21" />
+      <module name="ringstory-family" target="21" />
+      <module name="ringstory-gateway" target="21" />
+      <module name="ringstory-nacos" target="1.8" />
+      <module name="ringstory-notify" target="21" />
+      <module name="ringstory-review" target="21" />
+      <module name="ringstory-ringtree" target="21" />
+      <module name="ringstory-search" target="21" />
+      <module name="ringstory-story" target="21" />
+      <module name="ringstory-user" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

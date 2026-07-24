@@ -8,33 +8,21 @@
         <div class="ring ring-2" />
         <div class="ring ring-3" />
         <div class="ring ring-4" />
-        <div class="ring ring-5" />
-        <div class="ring ring-6" />
       </div>
 
       <!-- 浮动光点 -->
       <div class="particles">
-        <span v-for="i in 12" :key="i" class="particle" :style="particleStyle(i)" />
+        <span v-for="i in 8" :key="i" class="particle dot-fx" :class="'dot-' + i" />
       </div>
 
       <div class="brand-content">
+        <!-- 三层同心圆 Logo -->
         <div class="brand-logo">
           <div class="logo-rings">
-            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="1.5" opacity="0.3">
-                <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="30s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="40" cy="40" r="26" stroke="currentColor" stroke-width="1.5" opacity="0.5">
-                <animateTransform attributeName="transform" type="rotate" from="360 40 40" to="0 40 40" dur="20s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="40" cy="40" r="16" stroke="currentColor" stroke-width="2" opacity="0.7" />
-              <circle cx="40" cy="40" r="5" fill="currentColor">
-                <animate attributeName="r" values="5;6;5" dur="3s" repeatCount="indefinite" />
-              </circle>
-            </svg>
+            <span class="logo-icon">🌳</span>
           </div>
-          <span class="logo-text">RingStory</span>
         </div>
+        <span class="logo-text">RingStory</span>
 
         <h1 class="brand-title">
           <span class="title-line">时光为轮</span>
@@ -45,27 +33,21 @@
         每一张照片都是一圈年轮，记录着家庭时光的温暖与美好。
         </p>
 
-        <div class="brand-features">
-          <div class="feature-item">
-            <div class="feature-icon">📷</div>
-            <div class="feature-text">
-              <span class="feature-label">智能相册</span>
-              <span class="feature-desc">AI 分类整理</span>
-            </div>
+        <!-- 玻璃态功能亮点栏 -->
+        <div class="highlights">
+          <div class="highlight-item">
+            <span class="hl-icon">📷</span>
+            <span class="hl-text">智能整理</span>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">🌳</div>
-            <div class="feature-text">
-              <span class="feature-label">年轮图谱</span>
-              <span class="feature-desc">时光可视化</span>
-            </div>
+          <div class="hl-divider" />
+          <div class="highlight-item">
+            <span class="hl-icon">🌳</span>
+            <span class="hl-text">年轮图谱</span>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">🎬</div>
-            <div class="feature-text">
-              <span class="feature-label">年轮放映室</span>
-              <span class="feature-desc">自动生成回顾</span>
-            </div>
+          <div class="hl-divider" />
+          <div class="highlight-item">
+            <span class="hl-icon">🎬</span>
+            <span class="hl-text">时光放映</span>
           </div>
         </div>
       </div>
@@ -163,22 +145,6 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
-function particleStyle(i: number) {
-  const size = 3 + Math.random() * 5
-  const x = Math.random() * 100
-  const y = Math.random() * 100
-  const delay = Math.random() * 8
-  const duration = 6 + Math.random() * 8
-  return {
-    width: `${size}px`,
-    height: `${size}px`,
-    left: `${x}%`,
-    top: `${y}%`,
-    animationDelay: `${delay}s`,
-    animationDuration: `${duration}s`
-  }
-}
-
 async function onSubmit() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
@@ -237,19 +203,20 @@ function onCaptchaFail() {
 .ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(88, 166, 255, 0.06);
+  border: 1px solid rgba(88, 166, 255, 0.08);
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
 }
 
-.ring-1 { width: 200px; height: 200px; animation: ringPulse 8s ease-in-out infinite; }
-.ring-2 { width: 320px; height: 320px; animation: ringPulse 8s ease-in-out infinite 0.5s; }
-.ring-3 { width: 440px; height: 440px; animation: ringPulse 8s ease-in-out infinite 1s; }
-.ring-4 { width: 560px; height: 560px; animation: ringPulse 8s ease-in-out infinite 1.5s; }
-.ring-5 { width: 680px; height: 680px; animation: ringPulse 8s ease-in-out infinite 2s; }
-.ring-6 { width: 800px; height: 800px; animation: ringPulse 8s ease-in-out infinite 2.5s; }
+.ring-1 { width: 200px; height: 200px; animation: ringBreath 6s ease-in-out infinite; }
+.ring-2 { width: 320px; height: 320px; animation: ringBreath 6s ease-in-out infinite 0.5s; }
+.ring-3 { width: 440px; height: 440px; animation: ringBreath 6s ease-in-out infinite 1s; }
+.ring-4 { width: 560px; height: 560px; animation: ringBreath 6s ease-in-out infinite 1.5s; }
 
-@keyframes ringPulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.03); }
+@keyframes ringBreath {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
 }
 
 /* 浮动光点 */
@@ -262,13 +229,22 @@ function onCaptchaFail() {
 .particle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(88, 166, 255, 0.4);
-  animation: particleFloat 8s ease-in-out infinite;
+  background: rgba(88, 166, 255, 0.35);
+  animation: dotFloat 7s ease-in-out infinite;
 }
 
-@keyframes particleFloat {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
-  50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
+.dot-1 { width: 6px; height: 6px; left: 15%; top: 20%; animation-delay: 0s; }
+.dot-2 { width: 4px; height: 4px; left: 80%; top: 15%; animation-delay: 1s; }
+.dot-3 { width: 8px; height: 8px; left: 70%; top: 60%; animation-delay: 2s; }
+.dot-4 { width: 4px; height: 4px; left: 25%; top: 70%; animation-delay: 3s; }
+.dot-5 { width: 5px; height: 5px; left: 60%; top: 35%; animation-delay: 0.5s; }
+.dot-6 { width: 3px; height: 3px; left: 40%; top: 80%; animation-delay: 1.5s; }
+.dot-7 { width: 7px; height: 7px; left: 85%; top: 45%; animation-delay: 2.5s; }
+.dot-8 { width: 5px; height: 5px; left: 10%; top: 50%; animation-delay: 4s; }
+
+@keyframes dotFloat {
+  0%, 100% { transform: translateY(0); opacity: 0.2; }
+  50% { transform: translateY(-15px); opacity: 0.7; }
 }
 
 .brand-content {
@@ -276,24 +252,51 @@ function onCaptchaFail() {
   z-index: 2;
   padding: 48px;
   max-width: 500px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .brand-logo {
-  display: flex;
-  align-items: center;
-  gap: 16px;
   margin-bottom: 48px;
 }
 
+/* 三层同心圆 —— radial-gradient 硬停点方案 */
 .logo-rings {
-  width: 56px;
-  height: 56px;
-  color: #58a6ff;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle,
+      /* 中心渐变圆 */
+      #00d4ff 0%,
+      #a371f7 18%,
+      /* 内圆边缘到中环之间 (透明间隙) */
+      transparent 19%,
+      transparent 37%,
+      /* 中环 - 白色粗环带 */
+      #ffffff 38%,
+      #ffffff 46%,
+      /* 中环到外环之间 (透明间隙) */
+      transparent 47%,
+      transparent 66%,
+      /* 外环 - 白色粗环带 */
+      #ffffff 67%,
+      #ffffff 76%,
+      /* 外环之外透明 */
+      transparent 77%,
+      transparent 100%
+    );
+  box-shadow: 0 0 40px 8px rgba(0, 212, 255, 0.35), 0 0 80px 4px rgba(163, 113, 247, 0.15);
 }
 
-.logo-rings svg {
-  width: 100%;
-  height: 100%;
+.logo-icon {
+  font-size: 40px;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.6));
 }
 
 .logo-text {
@@ -330,57 +333,37 @@ function onCaptchaFail() {
   margin: 0 0 48px;
 }
 
-.brand-features {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.feature-item {
+/* 玻璃态功能亮点栏 */
+.highlights {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
+  gap: 16px;
+  padding: 14px 24px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  transition: all 0.3s;
+  border-radius: 40px;
+  backdrop-filter: blur(10px);
 }
 
-.feature-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(88, 166, 255, 0.2);
-  transform: translateX(4px);
-}
-
-.feature-icon {
-  font-size: 24px;
-  width: 40px;
-  height: 40px;
+.highlight-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(88, 166, 255, 0.1);
-  border-radius: 10px;
-  flex-shrink: 0;
+  gap: 6px;
 }
 
-.feature-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.hl-icon {
+  font-size: 18px;
 }
 
-.feature-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #e6edf3;
+.hl-text {
+  font-size: 13px;
+  color: rgba(230, 237, 243, 0.7);
 }
 
-.feature-desc {
-  font-size: 12px;
-  color: rgba(230, 237, 243, 0.4);
+.hl-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* ==================== 右侧表单面板 ==================== */
