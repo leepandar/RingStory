@@ -124,7 +124,32 @@
             </dependency>
             <dependency>
                 <groupId>com.ringstory</groupId>
-                <artifactId>ringstory-common</artifactId>
+                <artifactId>ringstory-common-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ringstory</groupId>
+                <artifactId>ringstory-common-mybatis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ringstory</groupId>
+                <artifactId>ringstory-common-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ringstory</groupId>
+                <artifactId>ringstory-common-log</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ringstory</groupId>
+                <artifactId>ringstory-common-feign</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ringstory</groupId>
+                <artifactId>ringstory-common-sms</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -16,33 +16,24 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
         </processorPath>
         <module name="ringstory-gateway" />
-        <module name="ringstory-notify" />
+        <module name="ringstory-common-core" />
+        <module name="ringstory-common-mybatis" />
+        <module name="ringstory-common-feign" />
         <module name="ringstory-search" />
+        <module name="ringstory-common-redis" />
         <module name="ringstory-album" />
         <module name="ringstory-ringtree" />
+        <module name="ringstory-review" />
+        <module name="ringstory-common-log" />
+        <module name="ringstory-rocketmq" />
+        <module name="ringstory-notify" />
         <module name="ringstory-api" />
         <module name="ringstory-family" />
-        <module name="ringstory-review" />
+        <module name="ringstory-common-sms" />
         <module name="ringstory-story" />
         <module name="ringstory-user" />
-        <module name="ringstory-common" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ringstory" target="21" />
-      <module name="ringstory-album" target="21" />
-      <module name="ringstory-api" target="21" />
-      <module name="ringstory-common" target="21" />
-      <module name="ringstory-family" target="21" />
-      <module name="ringstory-gateway" target="21" />
-      <module name="ringstory-nacos" target="1.8" />
-      <module name="ringstory-notify" target="21" />
-      <module name="ringstory-review" target="21" />
-      <module name="ringstory-ringtree" target="21" />
-      <module name="ringstory-search" target="21" />
-      <module name="ringstory-story" target="21" />
-      <module name="ringstory-user" target="21" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -50,12 +41,20 @@
       <module name="ringstory-album" options="-parameters" />
       <module name="ringstory-api" options="-parameters" />
       <module name="ringstory-common" options="-parameters" />
+      <module name="ringstory-common-core" options="-parameters" />
+      <module name="ringstory-common-feign" options="-parameters" />
+      <module name="ringstory-common-log" options="-parameters" />
+      <module name="ringstory-common-mybatis" options="-parameters" />
+      <module name="ringstory-common-redis" options="-parameters" />
+      <module name="ringstory-common-sms" options="-parameters" />
       <module name="ringstory-family" options="-parameters" />
       <module name="ringstory-gateway" options="-parameters" />
+      <module name="ringstory-modules" options="-parameters" />
       <module name="ringstory-nacos" options="-parameters" />
       <module name="ringstory-notify" options="-parameters" />
       <module name="ringstory-review" options="-parameters" />
       <module name="ringstory-ringtree" options="-parameters" />
+      <module name="ringstory-rocketmq" options="-parameters" />
       <module name="ringstory-search" options="-parameters" />
       <module name="ringstory-story" options="-parameters" />
       <module name="ringstory-user" options="-parameters" />

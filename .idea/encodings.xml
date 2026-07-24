@@ -3,11 +3,30 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/ringstory-album/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/ringstory-common-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/ringstory-common-feign/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/ringstory-common-log/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/ringstory-common-mybatis/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/ringstory-common-redis/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/ringstory-common-sms/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-family/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-album/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-family/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-notify/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-review/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-ringtree/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-search/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-story/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/ringstory-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-modules/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-nacos/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-notify/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ringstory-plugins/ringstory-rocketmq/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-review/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-ringtree/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ringstory-search/src/main/java" charset="UTF-8" />

@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ringstory</groupId>
-            <artifactId>ringstory-common</artifactId>
+            <artifactId>ringstory-common-mybatis</artifactId>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -27,10 +27,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-stream-rocketmq</artifactId>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
