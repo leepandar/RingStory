@@ -16,6 +16,11 @@ public interface CommentService extends IService<CommentEntity> {
     List<CommentEntity> listByPhotoId(Long photoId);
 
     /**
+     * 获取照片下的评论（分页）
+     */
+    List<CommentEntity> listByPhotoIdPaged(Long photoId, int page, int size);
+
+    /**
      * 获取评论的子评论
      */
     List<CommentEntity> listReplies(Long commentId);

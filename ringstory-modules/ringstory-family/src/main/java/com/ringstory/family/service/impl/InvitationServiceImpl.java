@@ -83,4 +83,17 @@ public class InvitationServiceImpl extends ServiceImpl<InvitationMapper, Invitat
         log.info("邀请已重置: invitationId={}, newExpireTime={}", invitationId, LocalDateTime.now().plusDays(validityDays));
         return getById(invitationId);
     }
+
+    @Override
+    public String generateQrCode(InvitationEntity invitation) {
+        // TODO: 对接微信官方 API 生成带参数的小程序码
+        // 生产环境实现步骤：
+        // 1. 调用微信 API wxacode.getUnlimited 生成小程序码
+        // 2. 将二维码图片上传到 OSS
+        // 3. 返回 OSS 签名下载 URL
+        // 4. 设置二维码有效期与邀请链接一致
+        String mockQrCodeUrl = "https://placeholder.ringstory.com/qrcode/invitation_" + invitation.getId() + ".png";
+        log.info("生成邀请二维码(Mock): invitationId={}, url={}", invitation.getId(), mockQrCodeUrl);
+        return mockQrCodeUrl;
+    }
 }

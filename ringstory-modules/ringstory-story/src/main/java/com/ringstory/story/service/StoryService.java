@@ -32,4 +32,9 @@ public interface StoryService extends IService<PhotoNoteEntity> {
      * 获取笔记的版本历史（分页）
      */
     List<PhotoNoteHistoryEntity> getNoteHistory(Long noteId, int page, int size);
+
+    /**
+     * 根据照片ID删除笔记及关联的历史版本和@提及记录
+     */
+    void deleteNoteByPhotoId(Long photoId);
 }

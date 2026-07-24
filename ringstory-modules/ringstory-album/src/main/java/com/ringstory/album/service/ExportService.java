@@ -8,12 +8,15 @@ import java.util.List;
 public interface ExportService {
 
     /**
-     * 批量导出照片（打包 ZIP）
+     * 批量导出照片
      *
-     * @param familyId  家庭 ID
-     * @param photoIds  照片 ID 列表
-     * @param operatorId 操作者 ID
+     * @param familyId         家庭 ID
+     * @param photoIds         照片 ID 列表
+     * @param operatorId       操作者 ID
+     * @param format           导出格式（zip/json）
+     * @param compressionLevel 压缩级别（0-9）
      * @return 导出文件下载 URL
      */
-    String exportPhotos(Long familyId, List<Long> photoIds, Long operatorId);
+    String exportPhotos(Long familyId, List<Long> photoIds, Long operatorId,
+                        String format, Integer compressionLevel);
 }

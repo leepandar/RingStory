@@ -21,9 +21,12 @@ public class ExportServiceImpl implements ExportService {
     private final PhotoService photoService;
 
     @Override
-    public String exportPhotos(Long familyId, List<Long> photoIds, Long operatorId) {
-        log.info("[ExportService] 开始导出照片: familyId={}, photoCount={}, operator={}",
-                familyId, photoIds.size(), operatorId);
+    public String exportPhotos(Long familyId, List<Long> photoIds, Long operatorId,
+                                String format, Integer compressionLevel) {
+        String actualFormat = (format != null) ? format : "zip";
+        int actualLevel = (compressionLevel != null) ? compressionLevel : 6;
+        log.info("[ExportService] 开始导出照片: familyId={}, photoCount={}, operator={}, format={}, compression={}",
+                familyId, photoIds.size(), operatorId, actualFormat, actualLevel);
 
         // Mock: 返回占位下载链接
         // TODO: 生产环境实现步骤：
@@ -34,7 +37,7 @@ public class ExportServiceImpl implements ExportService {
         // 5. 清理临时文件
         // 6. 返回签名下载 URL
 
-        String mockUrl = "https://placeholder.ringstory.com/export/" + familyId + "/photos.zip";
+        String mockUrl = "https://placeholder.ringstory.com/export/" + familyId + "/photos." + actualFormat;
         log.info("[ExportService] Mock 导出完成: url={}", mockUrl);
         return mockUrl;
     }

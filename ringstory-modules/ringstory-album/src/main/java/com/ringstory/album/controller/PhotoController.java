@@ -1,6 +1,9 @@
 package com.ringstory.album.controller;
 
 import com.ringstory.album.vo.PhotoDetailVO;
+import com.ringstory.album.dto.BatchAddTagsDTO;
+import com.ringstory.album.dto.CommentDTO;
+import com.ringstory.album.dto.CreateAlbumDTO;
 import com.ringstory.album.entity.AlbumEntity;
 import com.ringstory.album.entity.CommentEntity;
 import com.ringstory.album.entity.PhotoEntity;
@@ -9,9 +12,12 @@ import com.ringstory.album.service.CommentService;
 import com.ringstory.album.service.LikeService;
 import com.ringstory.album.service.PhotoDeleteService;
 import com.ringstory.album.service.PhotoService;
+import com.ringstory.album.service.StorageCalculatorService;
+import com.ringstory.album.dto.StorageBreakdownDTO;
 import com.ringstory.common.response.R;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +40,7 @@ public class PhotoController {
     private final CommentService commentService;
     private final LikeService likeService;
     private final PhotoDeleteService photoDeleteService;
+    private final StorageCalculatorService storageCalculatorService;
 
     // ==================== 照片相关 ====================
 
@@ -105,16 +112,8 @@ public class PhotoController {
      * 批量为照片添加标签
      */
     @PutMapping("/photos/batch/tags")
-    public R<Void> batchAddTags(@RequestBody Map<String, Object> body) {
-        @SuppressWarnings("unchecked")
-        List<Long> photoIds = ((List<Number>) body.get("photoIds")).stream()
-                .map(Number::longValue)
-                .toList();
-        @SuppressWarnings("unchecked")
-        List<Long> tagIds = ((List<Number>) body.get("tagIds")).stream()
-                .map(Number::longValue)
-                .toList();
-        photoService.batchAddTags(photoIds, tagIds);
+    public R<Void> batchAddTags(@Valid @RequestBody BatchAddTagsDTO request) {
+        photoService.batchAddTags(request.getPhotoIds(), request.getTagIds());
         return R.success();
     }
 
@@ -125,20 +124,19 @@ public class PhotoController {
      */
     @PostMapping("/{photoId}/comment")
     public R<CommentEntity> comment(@PathVariable Long photoId,
-                                    @RequestBody Map<String, Object> body) {
-        Long authorId = Long.valueOf(body.get("authorId").toString());
-        String content = body.get("content").toString();
-        Long parentId = body.containsKey("parentId")
-                ? Long.valueOf(body.get("parentId").toString()) : null;
-        return R.success(photoService.addComment(photoId, authorId, content, parentId));
+                                    @Valid @RequestBody CommentDTO request) {
+        return R.success(photoService.addComment(photoId, request.getAuthorId(),
+                request.getContent(), request.getParentId()));
     }
 
     /**
-     * 获取照片评论列表
+     * 获取照片评论列表（分页）
      */
     @GetMapping("/{photoId}/comments")
-    public R<List<CommentEntity>> getComments(@PathVariable Long photoId) {
-        return R.success(commentService.listByPhotoId(photoId));
+    public R<List<CommentEntity>> getComments(@PathVariable Long photoId,
+                                               @RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "20") int size) {
+        return R.success(commentService.listByPhotoIdPaged(photoId, page, size));
     }
 
     /**
@@ -156,11 +154,8 @@ public class PhotoController {
      * 创建相册
      */
     @PostMapping("/album")
-    public R<AlbumEntity> createAlbum(@RequestBody Map<String, Object> body) {
-        Long familyId = Long.valueOf(body.get("familyId").toString());
-        String name = body.get("name").toString();
-        Long creatorId = Long.valueOf(body.get("creatorId").toString());
-        return R.success(albumService.createAlbum(familyId, name, creatorId));
+    public R<AlbumEntity> createAlbum(@Valid @RequestBody CreateAlbumDTO request) {
+        return R.success(albumService.createAlbum(request.getFamilyId(), request.getName(), request.getCreatorId()));
     }
 
     /**
@@ -206,5 +201,44 @@ public class PhotoController {
     public R<Boolean> likeBlock(Long photoId, Long userId, String action, BlockException ex) {
         log.warn("点赞操作被限流, photoId={}", photoId);
         return R.fail(com.ringstory.common.exception.ErrorCode.INTERNAL_ERROR, "操作过于频繁，请稍后重试");
+    }
+
+    // ==================== 存储用量 ====================
+
+    /**
+     * 查询家庭存储用量明细
+     * RESTful: GET /api/album/storage/breakdown/{familyId}
+     *
+     * @param familyId 家庭ID
+     * @return 存储明细（原片/压缩版/缩略图/视频/回收站分类统计）
+     */
+    @GetMapping("/storage/breakdown/{familyId}")
+    public R<StorageBreakdownDTO> getStorageBreakdown(@PathVariable Long familyId) {
+        StorageBreakdownDTO breakdown = storageCalculatorService.getStorageBreakdown(familyId);
+        return R.success(breakdown);
+    }
+
+    /**
+     * 上传前预估存储占用
+     * RESTful: POST /api/album/storage/estimate
+     *
+     * @param fileSize 原始文件大小(bytes)
+     * @param format   文件格式
+     * @param width    宽度(px)
+     * @param height   高度(px)
+     * @return 预估总占用(bytes)
+     */
+    @PostMapping("/storage/estimate")
+    public R<Map<String, Object>> estimateStorage(
+            @RequestParam long fileSize,
+            @RequestParam(defaultValue = "jpg") String format,
+            @RequestParam(defaultValue = "0") int width,
+            @RequestParam(defaultValue = "0") int height) {
+        long estimated = storageCalculatorService.estimateStorageCost(fileSize, format, width, height);
+        return R.success(Map.of(
+                "originalSize", fileSize,
+                "estimatedTotal", estimated,
+                "format", format
+        ));
     }
 }

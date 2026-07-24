@@ -1,15 +1,17 @@
 package com.ringstory.album.controller;
 
+import com.ringstory.album.dto.AddPhotosToAlbumDTO;
+import com.ringstory.album.dto.CreateTagDTO;
 import com.ringstory.album.entity.PhotoAlbumEntity;
 import com.ringstory.album.entity.TagEntity;
 import com.ringstory.album.service.AlbumService;
 import com.ringstory.album.service.TagService;
 import com.ringstory.common.response.R;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 标签控制器
@@ -28,11 +30,8 @@ public class TagController {
      * 创建标签
      */
     @PostMapping("/tag")
-    public R<TagEntity> createTag(@RequestBody Map<String, Object> body) {
-        Long familyId = Long.valueOf(body.get("familyId").toString());
-        String name = body.get("name").toString();
-        Long createdBy = Long.valueOf(body.get("createdBy").toString());
-        return R.success(tagService.createTag(familyId, name, createdBy));
+    public R<TagEntity> createTag(@Valid @RequestBody CreateTagDTO request) {
+        return R.success(tagService.createTag(request.getFamilyId(), request.getName(), request.getCreatedBy()));
     }
 
     /**
@@ -106,13 +105,8 @@ public class TagController {
      */
     @PostMapping("/album/{albumId}/photos")
     public R<Void> addPhotosToAlbum(@PathVariable Long albumId,
-                                    @RequestBody Map<String, Object> body) {
-        Long addedBy = Long.valueOf(body.get("addedBy").toString());
-        @SuppressWarnings("unchecked")
-        List<Long> photoIds = ((List<Number>) body.get("photoIds")).stream()
-                .map(Number::longValue)
-                .toList();
-        albumService.addPhotosToAlbum(albumId, photoIds, addedBy);
+                                    @Valid @RequestBody AddPhotosToAlbumDTO request) {
+        albumService.addPhotosToAlbum(albumId, request.getPhotoIds(), request.getAddedBy());
         return R.success();
     }
 

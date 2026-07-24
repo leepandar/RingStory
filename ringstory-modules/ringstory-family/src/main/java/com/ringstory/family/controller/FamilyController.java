@@ -3,6 +3,7 @@ package com.ringstory.family.controller;
 import com.ringstory.common.exception.BusinessException;
 import com.ringstory.common.exception.ErrorCode;
 import com.ringstory.common.response.R;
+import com.ringstory.family.dto.CreateFamilyDTO;
 import com.ringstory.family.dto.MemberRoleUpdateDTO;
 import com.ringstory.family.entity.FamilyEntity;
 import com.ringstory.family.entity.FamilyMemberEntity;
@@ -15,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 家庭控制器
@@ -35,9 +35,8 @@ public class FamilyController {
      * 创建家庭
      */
     @PostMapping
-    public R<FamilyEntity> create(@RequestBody Map<String, String> body) {
-        Long userId = Long.valueOf(body.get("userId"));
-        return R.success(familyService.createFamily(body.get("name"), userId));
+    public R<FamilyEntity> create(@Valid @RequestBody CreateFamilyDTO request) {
+        return R.success(familyService.createFamily(request.getName(), request.getUserId()));
     }
 
     /**
@@ -148,6 +147,20 @@ public class FamilyController {
     @PostMapping("/invitations/{invitationId}/reset")
     public R<InvitationEntity> resetInvitation(@PathVariable Long invitationId) {
         return R.success(invitationService.resetInvitation(invitationId));
+    }
+
+    /**
+     * 生成邀请链接二维码（小程序码）
+     * 返回小程序码图片的 OSS URL
+     */
+    @GetMapping("/invitation/{id}/qrcode")
+    public R<String> getInvitationQrCode(@PathVariable Long id) {
+        InvitationEntity invitation = invitationService.getById(id);
+        if (invitation == null) {
+            throw new BusinessException(ErrorCode.INVITATION_NOT_FOUND);
+        }
+        String qrCodeUrl = invitationService.generateQrCode(invitation);
+        return R.success(qrCodeUrl);
     }
 
     // ==================== 人脸聚类设置 ====================

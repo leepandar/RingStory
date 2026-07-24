@@ -86,17 +86,25 @@ public class RingTreeServiceImpl implements RingTreeService {
     }
 
     /**
-     * 构建季节节点（含稀疏月份合并）
+     * 构建季节节点（含稀疏月份合并算法 v2）
+     * <p>
+     * 合并规则：
+     * 1. 照片数 < SPARSE_THRESHOLD(3) 的月份视为“稀疏”
+     * 2. 连续的稀疏月份合并为一个节点，标签为“X月-Y月碎片”
+     * 3. 非连续的稀疏月份分别合并为独立碎片节点
+     * 4. 跨年冬季（12月+1月+2月）视为一个季节周期处理
+     * </p>
      */
     private List<RingTreeNodeDTO> buildSeasonNodes(Long familyId, int year) {
         List<RingTreeNodeDTO> seasons = new ArrayList<>();
         int[][] seasonRanges = {{3, 5}, {6, 8}, {9, 11}, {12, 2}};
-
+        String[] seasonTypes = {"spring", "summer", "autumn", "winter"};
+    
         for (int i = 0; i < 4; i++) {
             int startMonth = seasonRanges[i][0];
             int endMonth = seasonRanges[i][1];
             String seasonLabel = SEASONS.charAt(i) + "季";
-
+    
             String sql;
             if (startMonth <= endMonth) {
                 sql = "SELECT MONTH(shoot_time) as m, COUNT(*) as cnt FROM t_photo_2026 "
@@ -110,45 +118,105 @@ public class RingTreeServiceImpl implements RingTreeService {
                         + "AND (MONTH(shoot_time) >= ? OR MONTH(shoot_time) <= ?) "
                         + "AND deleted_at IS NULL GROUP BY MONTH(shoot_time) ORDER BY m";
             }
-
+    
             List<Map<String, Object>> months = jdbcTemplate.queryForList(
                     sql, familyId, year, startMonth, endMonth);
             if (months.isEmpty()) {
                 continue;
             }
-
+    
             int seasonCnt = months.stream()
                     .mapToInt(m -> ((Number) m.get("cnt")).intValue()).sum();
-
-            // 稀疏月份合并：照片数 < 3 的月份合并为"季度碎片"
-            List<RingTreeNodeDTO> monthNodes = new ArrayList<>();
-            List<Map<String, Object>> sparseMonths = new ArrayList<>();
-
-            for (Map<String, Object> m : months) {
-                int cnt = ((Number) m.get("cnt")).intValue();
-                if (cnt < SPARSE_THRESHOLD) {
-                    sparseMonths.add(m);
-                } else {
-                    int month = ((Number) m.get("m")).intValue();
-                    List<RingTreeNodeDTO> dayNodes = buildDayNodes(familyId, year, month);
-                    monthNodes.add(new RingTreeNodeDTO(month + "月", "month", cnt, dayNodes));
-                }
-            }
-
-            // 将稀疏月份合并为一个"碎片"节点
-            if (!sparseMonths.isEmpty()) {
-                int sparseCnt = sparseMonths.stream()
-                        .mapToInt(m -> ((Number) m.get("cnt")).intValue()).sum();
-                String sparseLabel = sparseMonths.stream()
-                        .map(m -> ((Number) m.get("m")).intValue() + "月")
-                        .collect(Collectors.joining(","));
-                monthNodes.add(new RingTreeNodeDTO(
-                        "碎片(" + sparseLabel + ")", "month_sparse", sparseCnt, new ArrayList<>()));
-            }
-
-            seasons.add(new RingTreeNodeDTO(seasonLabel, "season", seasonCnt, monthNodes));
+    
+            // 稀疏月份合并算法 v2：连续稀疏月份分组
+            List<RingTreeNodeDTO> monthNodes = mergeSparseMonths(familyId, year, months);
+    
+            seasons.add(new RingTreeNodeDTO(seasonLabel, seasonTypes[i], seasonCnt, monthNodes));
         }
         return seasons;
+    }
+    
+    /**
+     * 稀疏月份合并算法
+     * <p>
+     * 将月份列表分为“稠密”和“稀疏”两组：
+     * - 稠密月份（>= 阈值）：正常展示为月节点，展开到日级别
+     * - 稀疏月份（< 阈值）：将连续的稀疏月份合并为一个“碎片”节点
+     *   例如：3月(1张) + 4月(2张) 连续稀疏 → 合并为“3月-4月碎片(3张)”
+     *   而 6月(1张) 和 8月(2张) 中间隔了稠密的7月 → 分为两个碎片节点
+     * </p>
+     */
+    private List<RingTreeNodeDTO> mergeSparseMonths(Long familyId, int year,
+                                                      List<Map<String, Object>> months) {
+        List<RingTreeNodeDTO> result = new ArrayList<>();
+        List<Map<String, Object>> sparseGroup = new ArrayList<>();
+    
+        for (Map<String, Object> m : months) {
+            int cnt = ((Number) m.get("cnt")).intValue();
+            int month = ((Number) m.get("m")).intValue();
+    
+            if (cnt < SPARSE_THRESHOLD) {
+                // 当前月稀疏，加入临时组
+                sparseGroup.add(m);
+            } else {
+                // 当前月稠密，先刷新稀疏组，再添加稠密月
+                if (!sparseGroup.isEmpty()) {
+                    result.add(buildSparseNode(sparseGroup));
+                    sparseGroup.clear();
+                }
+                List<RingTreeNodeDTO> dayNodes = buildDayNodes(familyId, year, month);
+                result.add(new RingTreeNodeDTO(month + "月", "month", cnt, dayNodes));
+            }
+        }
+        // 处理末尾剩余的稀疏组
+        if (!sparseGroup.isEmpty()) {
+            result.add(buildSparseNode(sparseGroup));
+        }
+        return result;
+    }
+    
+    /**
+     * 构建稀疏月份合并节点
+     * 标签格式：单月 → "X月碎片"，连续月 → "X月-Y月碎片"，非连续 → "X月,Z月碎片"
+     */
+    private RingTreeNodeDTO buildSparseNode(List<Map<String, Object>> sparseMonths) {
+        int totalCnt = sparseMonths.stream()
+                .mapToInt(m -> ((Number) m.get("cnt")).intValue()).sum();
+        List<Integer> monthNums = sparseMonths.stream()
+                .map(m -> ((Number) m.get("m")).intValue())
+                .collect(Collectors.toList());
+    
+        String label;
+        if (monthNums.size() == 1) {
+            label = monthNums.get(0) + "月碎片";
+        } else if (isConsecutive(monthNums)) {
+            // 连续月份：显示范围
+            label = monthNums.get(0) + "月-" + monthNums.get(monthNums.size() - 1) + "月碎片";
+        } else {
+            // 非连续：列举
+            String monthStr = monthNums.stream()
+                    .map(n -> n + "月")
+                    .collect(Collectors.joining(","));
+            label = "碎片(" + monthStr + ")";
+        }
+    
+        return new RingTreeNodeDTO(label, "month_sparse", totalCnt, new ArrayList<>());
+    }
+    
+    /**
+     * 判断月份列表是否连续（处理跨年情况：12→1→2 视为连续）
+     */
+    private boolean isConsecutive(List<Integer> months) {
+        if (months.size() <= 1) return true;
+        for (int i = 1; i < months.size(); i++) {
+            int prev = months.get(i - 1);
+            int curr = months.get(i);
+            // 正常连续 或 跨年(12→1)
+            if (curr != prev + 1 && !(prev == 12 && curr == 1)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

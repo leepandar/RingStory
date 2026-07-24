@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ringstory.album.entity.*;
 import com.ringstory.album.mapper.*;
 import com.ringstory.album.service.PhotoDeleteService;
+import com.ringstory.album.feign.StoryFeignClient;
 import com.ringstory.common.exception.BusinessException;
 import com.ringstory.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class PhotoDeleteServiceImpl implements PhotoDeleteService {
     private final PhotoTagMapper photoTagMapper;
     private final PhotoAlbumMapper photoAlbumMapper;
     private final FacePhotoMapper facePhotoMapper;
+    private final StoryFeignClient storyFeignClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -60,8 +62,8 @@ public class PhotoDeleteServiceImpl implements PhotoDeleteService {
             // TODO: 查询 t_review_photo 表，若在回顾中则加入 inReviewIds
             // 当前为预留逻辑，待 review 模块实现后补充
 
-            // 2. 删除照片笔记及相关数据
-            deletePhotoNotes(photoId);
+            // 2. 删除照片笔记及相关数据（通过 Feign 调用 story 模块）
+            storyFeignClient.deleteNoteByPhotoId(photoId);
 
             // 3. 删除人脸标注
             deleteFacePhotos(photoId);
@@ -86,22 +88,12 @@ public class PhotoDeleteServiceImpl implements PhotoDeleteService {
         }
 
         // 9. TODO: 发送 RocketMQ 事件（缓存失效、计数更新）
-        // photoDeleteEventProducer.send(new PhotoDeletedEvent(deletedIds));
+        // photoDeleteEventProducer.send(new PhotoDeletedEvent(deletedIds, photo.getFamilyId()));
 
         result.put("deletedCount", deletedIds.size());
         result.put("deletedIds", deletedIds);
         result.put("inReviewIds", inReviewIds);
         return result;
-    }
-
-    private void deletePhotoNotes(Long photoId) {
-        // 删除笔记的 @提及关联
-        // TODO: 使用 PhotoNoteMentionMapper 删除关联
-        // 删除笔记版本历史
-        // TODO: 使用 PhotoNoteHistoryMapper 删除历史
-        // 删除笔记本身
-        // TODO: 使用 PhotoNoteMapper 删除笔记
-        log.debug("删除照片笔记及关联: photoId={}", photoId);
     }
 
     private void deleteFacePhotos(Long photoId) {

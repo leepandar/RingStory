@@ -60,4 +60,13 @@ public class StoryController {
         Long operatorId = Long.valueOf(body.get("operatorId").toString());
         return R.success(storyService.rollbackNote(noteId, targetVersion, operatorId));
     }
+
+    /**
+     * 根据照片ID删除笔记及关联数据（供 album 模块内部调用）
+     */
+    @DeleteMapping("/internal/note/by-photo/{photoId}")
+    public R<Void> deleteNoteByPhotoId(@PathVariable Long photoId) {
+        storyService.deleteNoteByPhotoId(photoId);
+        return R.success();
+    }
 }

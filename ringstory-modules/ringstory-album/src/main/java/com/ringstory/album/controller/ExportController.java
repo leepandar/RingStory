@@ -1,12 +1,11 @@
 package com.ringstory.album.controller;
 
+import com.ringstory.album.dto.ExportPhotosDTO;
 import com.ringstory.album.service.ExportService;
 import com.ringstory.common.response.R;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 数据导出控制器
@@ -20,17 +19,13 @@ public class ExportController {
 
     /**
      * 批量导出照片
+     * 支持指定导出格式（zip/json）和压缩级别（0-9）
      */
     @PostMapping("/photos")
-    public R<Map<String, String>> exportPhotos(@RequestBody Map<String, Object> body) {
-        Long familyId = Long.valueOf(body.get("familyId").toString());
-        Long operatorId = Long.valueOf(body.get("operatorId").toString());
-        @SuppressWarnings("unchecked")
-        List<Long> photoIds = ((List<Number>) body.get("photoIds")).stream()
-                .map(Number::longValue)
-                .toList();
-
-        String downloadUrl = exportService.exportPhotos(familyId, photoIds, operatorId);
-        return R.success(Map.of("downloadUrl", downloadUrl));
+    public R<String> exportPhotos(@Valid @RequestBody ExportPhotosDTO request) {
+        String downloadUrl = exportService.exportPhotos(
+                request.getFamilyId(), request.getPhotoIds(), request.getOperatorId(),
+                request.getFormat(), request.getCompressionLevel());
+        return R.success(downloadUrl);
     }
 }

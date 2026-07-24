@@ -32,4 +32,13 @@ public interface InvitationService extends IService<InvitationEntity> {
      * 重置过期/撤销的邀请链接（重新生成过期时间，状态恢复为pending）
      */
     InvitationEntity resetInvitation(Long invitationId);
+
+    /**
+     * 生成邀请链接二维码（小程序码）
+     * 调用微信官方 API 生成带参数的小程序码，返回图片的 OSS URL
+     *
+     * @param invitation 邀请实体
+     * @return 小程序码图片 URL
+     */
+    String generateQrCode(InvitationEntity invitation);
 }

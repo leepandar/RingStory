@@ -4,9 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ringstory.review.entity.MomentsReviewEntity;
 import com.ringstory.review.mapper.MomentsReviewMapper;
-import com.ringstory.review.service.PosterGenerator;
+import com.ringstory.review.service.ReviewDegradationService;
 import com.ringstory.review.service.ReviewService;
-import com.ringstory.review.service.VideoGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -16,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 放映室服务实现类
@@ -25,8 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReviewServiceImpl extends ServiceImpl<MomentsReviewMapper, MomentsReviewEntity> implements ReviewService {
 
-    private final PosterGenerator posterGenerator;
-    private final VideoGenerator videoGenerator;
+    private final ReviewDegradationService reviewDegradationService;
     private final RocketMQTemplate rocketMQTemplate;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,20 +42,12 @@ public class ReviewServiceImpl extends ServiceImpl<MomentsReviewMapper, MomentsR
         review.setStatus(2); // 生成中
         save(review);
 
-        // 生成海报（降级方案）
-        try {
-            String posterUrl = posterGenerator.generatePoster(List.of(), review.getTitle(), "grid");
-            review.setCoverUrl(posterUrl);
-        } catch (Exception e) {
-            log.warn("海报生成失败: reviewId={}", review.getId(), e);
-        }
-
-        review.setStatus(1);
-        review.setGeneratedAt(LocalDateTime.now());
+        // 使用降级策略生成回顾媒体
+        List<Long> photoIds = getTopPhotoIds(familyId, year, month, 9);
+        reviewDegradationService.generateWithDegradation(review, photoIds);
         updateById(review);
 
-        // 发送回顾完成事件（通知全体成员）
-        sendReviewCompleteEvent(familyId, review.getTitle());
+        sendReviewCompleteEvent(familyId, review.getTitle(), review.getResourceType());
     }
 
     @Override
@@ -71,18 +62,11 @@ public class ReviewServiceImpl extends ServiceImpl<MomentsReviewMapper, MomentsR
         review.setStatus(2);
         save(review);
 
-        try {
-            String posterUrl = posterGenerator.generatePoster(List.of(), review.getTitle(), "collage");
-            review.setCoverUrl(posterUrl);
-        } catch (Exception e) {
-            log.warn("海报生成失败: reviewId={}", review.getId(), e);
-        }
-
-        review.setStatus(1);
-        review.setGeneratedAt(LocalDateTime.now());
+        List<Long> photoIds = getTopPhotoIdsByRange(familyId, year, (season - 1) * 3 + 1, 20);
+        reviewDegradationService.generateWithDegradation(review, photoIds);
         updateById(review);
 
-        sendReviewCompleteEvent(familyId, review.getTitle());
+        sendReviewCompleteEvent(familyId, review.getTitle(), review.getResourceType());
     }
 
     @Override
@@ -97,18 +81,11 @@ public class ReviewServiceImpl extends ServiceImpl<MomentsReviewMapper, MomentsR
         review.setStatus(2);
         save(review);
 
-        try {
-            String posterUrl = posterGenerator.generatePoster(List.of(), review.getTitle(), "timeline");
-            review.setCoverUrl(posterUrl);
-        } catch (Exception e) {
-            log.warn("海报生成失败: reviewId={}", review.getId(), e);
-        }
-
-        review.setStatus(1);
-        review.setGeneratedAt(LocalDateTime.now());
+        List<Long> photoIds = getMonthlyRepresentatives(familyId, year);
+        reviewDegradationService.generateWithDegradation(review, photoIds);
         updateById(review);
 
-        sendReviewCompleteEvent(familyId, review.getTitle());
+        sendReviewCompleteEvent(familyId, review.getTitle(), review.getResourceType());
     }
 
     @Override
@@ -120,19 +97,34 @@ public class ReviewServiceImpl extends ServiceImpl<MomentsReviewMapper, MomentsR
     /**
      * 发送回顾完成事件到通知服务
      */
-    private void sendReviewCompleteEvent(Long familyId, String reviewTitle) {
+    private void sendReviewCompleteEvent(Long familyId, String reviewTitle, String resourceType) {
         try {
             Map<String, Object> event = new HashMap<>();
             event.put("eventType", "review_complete");
             event.put("familyId", familyId);
             event.put("reviewTitle", reviewTitle);
-            // memberIds 留空，由通知服务查询家庭成员
+            event.put("resourceType", resourceType != null ? resourceType : "none");
             event.put("memberIds", List.of());
             rocketMQTemplate.convertAndSend("notification_trigger",
                     objectMapper.writeValueAsString(event));
-            log.info("回顾完成事件已发送: familyId={}, title={}", familyId, reviewTitle);
+            log.info("回顾完成事件已发送: familyId={}, title={}, type={}", familyId, reviewTitle, resourceType);
         } catch (Exception e) {
             log.error("发送回顾完成事件失败", e);
         }
+    }
+
+    /**
+     * 获取月度 top 照片（按点赞数排序）
+     */
+    private List<Long> getTopPhotoIds(Long familyId, int year, int month, int limit) {
+        return List.of(); // 由 ReviewGenerateService 的算法提供，此处留空由降级服务处理
+    }
+
+    private List<Long> getTopPhotoIdsByRange(Long familyId, int year, int startMonth, int limit) {
+        return List.of();
+    }
+
+    private List<Long> getMonthlyRepresentatives(Long familyId, int year) {
+        return List.of();
     }
 }
